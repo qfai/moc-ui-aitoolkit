@@ -434,6 +434,37 @@
             color: #e0e0e0;
             overflow-x: auto;
             white-space: pre;
+            width: 100%;
+            min-height: 300px;
+            resize: vertical;
+        }
+
+        .yaml-checkbox-container {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .yaml-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #007acc;
+        }
+
+        .yaml-checkbox-label {
+            color: #e0e0e0;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .yaml-section {
+            display: none;
+        }
+
+        .yaml-section.visible {
+            display: block;
         }
 
         .config-section {
@@ -681,12 +712,20 @@
                 </div>
 
                 <div class="config-section">
-                    <div class="config-title">
-                        <div class="config-icon"></div>
-                        Generated YAML Configuration
+                    <div class="yaml-checkbox-container">
+                        <input type="checkbox" id="showYamlCheckbox" class="yaml-checkbox" onchange="toggleYamlSection()">
+                        <label for="showYamlCheckbox" class="yaml-checkbox-label">Show YAML Configuration (for advanced users)</label>
                     </div>
-                    <div class="yaml-preview" id="yamlPreview">
-# Configuration will be generated here...
+                    
+                    <div class="yaml-section" id="yamlSection">
+                        <div class="config-title">
+                            <div class="config-icon"></div>
+                            Generated YAML Configuration
+                        </div>
+                        <textarea class="yaml-preview" id="yamlPreview" placeholder="Configuration will be generated here..." onchange="markYamlAsEdited()"># Configuration will be generated here...</textarea>
+                        <div style="margin-top: 8px; font-size: 12px; color: #a0a0a0;">
+                            <strong>Note:</strong> You can edit this YAML configuration before deployment. Your changes will be used during deployment.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -753,7 +792,10 @@
         // Global state
         let currentStep = 1;
         let selectedModel = null;
-        let selectedCluster = null;        let deploymentConfig = {
+        let selectedCluster = null;
+        let yamlEdited = false;  // Track if user has edited the YAML
+
+        let deploymentConfig = {
             name: 'My LLM Deployment',
             replicas: 1,
             memoryLimit: 8,
@@ -1029,8 +1071,37 @@ data:
       enable-chunked-prefill: true
       # see https://docs.vllm.ai/en/latest/serving/engine_args.html for more options.`;
 
-            document.getElementById('yamlPreview').textContent = yaml;
-        }function deployModel() {
+            document.getElementById('yamlPreview').value = yaml;
+            yamlEdited = false;  // Reset the edited flag when generating new YAML
+        }
+
+        // Toggle YAML section visibility
+        function toggleYamlSection() {
+            const checkbox = document.getElementById('showYamlCheckbox');
+            const yamlSection = document.getElementById('yamlSection');
+            
+            if (checkbox.checked) {
+                yamlSection.classList.add('visible');
+                // Generate YAML if not already generated
+                if (!document.getElementById('yamlPreview').value.trim() || 
+                    document.getElementById('yamlPreview').value === '# Configuration will be generated here...') {
+                    generateYAML();
+                }
+            } else {
+                yamlSection.classList.remove('visible');
+            }
+        }
+
+        // Mark YAML as edited by user
+        function markYamlAsEdited() {
+            yamlEdited = true;
+        }
+
+        // Get the current YAML content (either generated or user-edited)
+        function getCurrentYaml() {
+            const yamlTextarea = document.getElementById('yamlPreview');
+            return yamlTextarea.value;
+        }        function deployModel() {
             // Store deployment configuration in localStorage for the progress page
             localStorage.setItem('selectedModel', selectedModel);
             localStorage.setItem('selectedCluster', selectedCluster);
@@ -1041,6 +1112,17 @@ data:
             localStorage.setItem('cpuLimit', deploymentConfig.cpuLimit);
             localStorage.setItem('gpuMemoryUtilization', deploymentConfig.gpuMemoryUtilization);
             localStorage.setItem('swapSpace', deploymentConfig.swapSpace);
+            
+            // Store YAML configuration if user has edited it
+            if (yamlEdited) {
+                const currentYaml = getCurrentYaml();
+                localStorage.setItem('customYaml', currentYaml);
+                localStorage.setItem('useCustomYaml', 'true');
+                console.log('Using custom YAML configuration for deployment');
+            } else {
+                localStorage.removeItem('customYaml');
+                localStorage.removeItem('useCustomYaml');
+            }
             
             // Redirect to deployment progress page
             window.location.href = 'moc-deployment-progress.html?' + 

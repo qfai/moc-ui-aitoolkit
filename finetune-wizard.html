@@ -431,6 +431,37 @@
             color: #e0e0e0;
             overflow-x: auto;
             white-space: pre;
+            width: 100%;
+            min-height: 300px;
+            resize: vertical;
+        }
+
+        .yaml-checkbox-container {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .yaml-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #007acc;
+        }
+
+        .yaml-checkbox-label {
+            color: #e0e0e0;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .yaml-section {
+            display: none;
+        }
+
+        .yaml-section.visible {
+            display: block;
         }
 
         /* Buttons */
@@ -795,12 +826,20 @@
                 </div>
 
                 <div class="config-section">
-                    <div class="config-title">
-                        <div class="config-icon"></div>
-                        Generated YAML Configuration
+                    <div class="yaml-checkbox-container">
+                        <input type="checkbox" id="showYamlCheckbox" class="yaml-checkbox" onchange="toggleYamlSection()">
+                        <label for="showYamlCheckbox" class="yaml-checkbox-label">Show YAML Configuration (for advanced users)</label>
                     </div>
-                    <div class="yaml-preview" id="yamlPreview">
-# Configuration will be generated here...
+                    
+                    <div class="yaml-section" id="yamlSection">
+                        <div class="config-title">
+                            <div class="config-icon"></div>
+                            Generated YAML Configuration
+                        </div>
+                        <textarea class="yaml-preview" id="yamlPreview" placeholder="Configuration will be generated here..." onchange="markYamlAsEdited()"># Configuration will be generated here...</textarea>
+                        <div style="margin-top: 8px; font-size: 12px; color: #a0a0a0;">
+                            <strong>Note:</strong> You can edit this YAML configuration before deployment. Your changes will be used during fine-tuning job submission.
+                        </div>
                     </div>
                 </div>
 
@@ -827,6 +866,7 @@
         let currentStep = 1;
         let selectedModel = null;
         let selectedMethod = 'qlora';
+        let yamlEdited = false;  // Track if user has edited the YAML
         let finetuneConfig = {
             jobName: 'my-finetune-job',
             loraAlpha: 32,
@@ -1044,11 +1084,56 @@ spec:
       image: ${finetuneConfig.outputImage}
       imagePushSecret: ${finetuneConfig.imagePushSecret}`;
 
-            document.getElementById('yamlPreview').textContent = yaml;
+            document.getElementById('yamlPreview').value = yaml;
+            yamlEdited = false;  // Reset the edited flag when generating new YAML
+        }
+
+        // Toggle YAML section visibility
+        function toggleYamlSection() {
+            const checkbox = document.getElementById('showYamlCheckbox');
+            const yamlSection = document.getElementById('yamlSection');
+            
+            if (checkbox.checked) {
+                yamlSection.classList.add('visible');
+                // Generate YAML if not already generated
+                if (!document.getElementById('yamlPreview').value.trim() || 
+                    document.getElementById('yamlPreview').value === '# Configuration will be generated here...') {
+                    generateYAML();
+                }
+            } else {
+                yamlSection.classList.remove('visible');
+            }
+        }
+
+        // Mark YAML as edited by user
+        function markYamlAsEdited() {
+            yamlEdited = true;
+        }
+
+        // Get the current YAML content (either generated or user-edited)
+        function getCurrentYaml() {
+            const yamlTextarea = document.getElementById('yamlPreview');
+            return yamlTextarea.value;
         }
 
         // Deployment
         function deployFinetuneJob() {
+            // Store YAML configuration if user has edited it
+            if (yamlEdited) {
+                const currentYaml = getCurrentYaml();
+                localStorage.setItem('finetuneCustomYaml', currentYaml);
+                localStorage.setItem('useFinetuneCustomYaml', 'true');
+                console.log('Using custom YAML configuration for fine-tuning job');
+            } else {
+                localStorage.removeItem('finetuneCustomYaml');
+                localStorage.removeItem('useFinetuneCustomYaml');
+            }
+
+            // Store fine-tuning configuration for progress tracking
+            localStorage.setItem('finetuneJobName', finetuneConfig.jobName);
+            localStorage.setItem('finetuneModel', selectedModel);
+            localStorage.setItem('finetuneMethod', selectedMethod);
+            
             const progressDiv = document.getElementById('deploymentProgress');
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
