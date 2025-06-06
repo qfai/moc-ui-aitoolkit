@@ -97,6 +97,19 @@
             font-size: 13px;
         }
 
+        .model-sublist {
+            margin-left: 16px;
+        }
+
+        .sub-item {
+            padding-left: 16px;
+        }
+
+        .sub-item .model-item-text {
+            font-size: 12px;
+            color: #aaa;
+        }
+
         .main-content {
             padding: 16px 20px;
             flex: 1;
@@ -311,21 +324,35 @@
         </div>        <div class='section-header toggle-section expanded' onclick='toggleSection(this, "myModels")'>
             <span class='toggle-icon'></span>
             <span class='section-header-text'>MY MODELS</span>
-        </div>
-        <div class='section-content' id='myModels'>
-            <div class='model-item'>
-                <span class='model-item-text'>deepseek-v1-instill-llama-8b</span>
+        </div>        <div class='section-content' id='myModels'>
+            <div class='model-item toggle-section expanded'>
+                <span class='toggle-icon'></span>
+                <span class='model-item-text'>Custom</span>
             </div>
-            <div class='model-item'>
-                <span class='model-item-text'>gpt-4o</span>
+            <div class='model-sublist'>
+                <div class='model-item sub-item'>
+                    <span class='model-item-text'>deepseek-v1-instill-llama-8b</span>
+                </div>
+                <div class='model-item sub-item'>
+                    <span class='model-item-text'>gpt-4o</span>
+                </div>
+                <div class='model-item sub-item'>
+                    <span class='model-item-text'>mistral/Mistral-7B-Instruct-v0.3</span>
+                </div>
             </div>
-            <div class='model-item'>
-                <span class='model-item-text'>mistral/Mistral-7B-Instruct-v0.3</span>
+            <div class='model-item toggle-section expanded'>
+                <span class='toggle-icon'></span>
+                <span class='model-item-text'>Edge</span>
             </div>
-            <div class='model-item'>
-                <span class='model-item-text'>phi-3-mini-4k-instruct</span>
+            <div class='model-sublist'>
+                <div class='model-item sub-item'>
+                    <span class='model-item-text'>phi-3-mini-4k-instruct</span>
+                </div>
+                <div class='model-item sub-item'>
+                    <span class='model-item-text'>microsoft/phi-2</span>
+                </div>
             </div>
-        </div>        <div class='section-header toggle-section expanded' onclick='toggleSection(this, "models")'>
+        </div><div class='section-header toggle-section expanded' onclick='toggleSection(this, "models")'>
             <span class='toggle-icon'></span>
             <span class='section-header-text'>MODELS</span>
         </div>
@@ -587,7 +614,28 @@
                     document.getElementById('clustersSection').classList.add('hidden');
                     document.getElementById('deployedModelsSection').classList.remove('hidden');
                 }
-            });        });
+            });
+        });
+
+        // Initialize model sublist toggles
+        document.addEventListener('DOMContentLoaded', function() {
+            const modelItems = document.querySelectorAll('#myModels .model-item:not(.sub-item)');
+            modelItems.forEach(item => {
+                if (item.querySelector('.toggle-icon')) {
+                    item.addEventListener('click', function() {
+                        const sublist = this.nextElementSibling;
+                        if (sublist && sublist.classList.contains('model-sublist')) {
+                            this.classList.toggle('expanded');
+                            if (sublist.style.display === 'none') {
+                                sublist.style.display = 'block';
+                            } else {
+                                sublist.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            });
+        });
         
         // Deploy to Edge button handler
         document.getElementById('deployToEdgeBtn').addEventListener('click', function() {

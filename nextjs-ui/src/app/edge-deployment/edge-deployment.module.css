@@ -1,0 +1,591 @@
+/* Edge Deployment Page Styles */
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--vscode-background);
+  color: var(--vscode-foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--vscode-sidebar-background);
+  border-right: 1px solid var(--vscode-panel-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebarHeader {
+  padding: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.sidebarHeader h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--vscode-foreground);
+}
+
+.sectionHeader {
+  padding: 12px 16px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sectionContent {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.modelItem {
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--vscode-foreground);
+}
+
+.modelItem:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.contentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  background-color: var(--vscode-panel-background);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.tab {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  background-color: var(--vscode-tab-inactive-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+}
+
+.tab.active {
+  background-color: var(--vscode-tab-active-background);
+  color: var(--vscode-foreground);
+}
+
+.tab:not(.active) {
+  color: var(--vscode-tab-inactiveForeground);
+}
+
+.tab:hover:not(.active) {
+  background-color: var(--vscode-tab-hoverBackground);
+}
+
+.deployButton {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.deployButton:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.mainContent {
+  padding: 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.mainContent h2 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.mainContent p {
+  margin: 0 0 16px 0;
+  color: var(--vscode-descriptionForeground);
+  font-size: 14px;
+}
+
+.authContainer {
+  text-align: center;
+  padding: 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.authIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.authTitle {
+  font-size: 18px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.authDescription {
+  font-size: 14px;
+  margin-bottom: 24px;
+  color: var(--vscode-descriptionForeground);
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.authButton {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.authButton:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.clusterCard {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 4px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+
+.clusterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--vscode-panel-background);
+  cursor: pointer;
+  user-select: none;
+}
+
+.clusterName {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.clusterStatus {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+}
+
+.clusterContent {
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.metricRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.metricLabel {
+  color: var(--vscode-descriptionForeground);
+}
+
+.metricValue {
+  font-weight: bold;
+}
+
+.statusDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.statusDot.green {
+  background-color: #4EC9B0;
+}
+
+.statusDot.yellow {
+  background-color: #FFCC00;
+}
+
+.statusDot.red {
+  background-color: #F48771;
+}
+
+.statusDot.gray {
+  background-color: #888888;
+}
+
+.deployedModelCard {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 4px;
+  margin: 8px 0;
+  padding: 12px;
+}
+
+.deployedModelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.deployedModelName {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.deployedModelCluster {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: 8px;
+}
+
+.deployedModelMetrics {
+  font-size: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.badge {
+  display: inline-block;
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContent {
+  background-color: var(--vscode-editor-background);
+  border-radius: 4px;
+  width: 700px;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  background-color: var(--vscode-panel-background);
+}
+
+.stepsIndicator {
+  display: flex;
+  gap: 16px;
+}
+
+.step {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-descriptionForeground);
+}
+
+.step.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--vscode-foreground);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modalBody {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.stepContainer {
+  margin-bottom: 20px;
+}
+
+.stepHeader {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: 4px;
+}
+
+.stepTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.formInput {
+  width: 100%;
+  padding: 8px;
+  background-color: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 4px;
+  color: var(--vscode-input-foreground);
+  font-size: 13px;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--vscode-focusBorder);
+}
+
+.modelsList {
+  margin-bottom: 20px;
+}
+
+.modelOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modelOption:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.modelOption.selected {
+  border-color: var(--vscode-button-background);
+  background-color: var(--vscode-list-activeSelectionBackground);
+}
+
+.modelDetails {
+  flex: 1;
+}
+
+.selectedModelName {
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.modelDescription {
+  font-size: 13px;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.modelSize {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.deploymentSummary {
+  background-color: var(--vscode-panel-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.deploymentSummary h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.summaryLabel {
+  color: var(--vscode-descriptionForeground);
+}
+
+.summaryValue {
+  font-weight: 500;
+}
+
+.clusterFilters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filterSelect {
+  padding: 8px 12px;
+  background-color: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 4px;
+  color: var(--vscode-dropdown-foreground);
+  font-size: 13px;
+}
+
+.clusterOptions {
+  margin-bottom: 20px;
+}
+
+.clusterOption {
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clusterOption:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.clusterOption.selected {
+  border-color: var(--vscode-button-background);
+  background-color: var(--vscode-list-activeSelectionBackground);
+}
+
+.clusterOptionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.clusterOptionDetails {
+  padding: 12px 16px;
+}
+
+.clusterDetailRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.clusterDetailLabel {
+  color: var(--vscode-descriptionForeground);
+}
+
+.clusterDetailValue {
+  font-weight: 500;
+}
+
+.wizardButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.buttonPrimary {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.buttonPrimary:disabled {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  cursor: not-allowed;
+}
+
+.buttonSecondary {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.buttonSecondary:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}

@@ -1,0 +1,496 @@
+/* Deployment Wizard Styles */
+
+.body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.wizardContainer {
+  width: 900px;
+  max-width: 95vw;
+  background: #2d2d2d;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.wizardHeader {
+  background: linear-gradient(135deg, #007acc, #005a9e);
+  padding: 24px;
+  text-align: center;
+  color: white;
+}
+
+.wizardTitle {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.wizardSubtitle {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.stepIndicator {
+  display: flex;
+  justify-content: center;
+  margin: 24px;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: #007acc;
+  color: white;
+}
+
+.step.completed {
+  background: #16a085;
+  color: white;
+}
+
+.step.inactive {
+  background: #404040;
+  color: #a0a0a0;
+}
+
+.stepNumber {
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.step.completed .stepNumber {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.wizardContent {
+  padding: 24px;
+}
+
+.stepContent {
+  display: block;
+}
+
+.stepTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #e0e0e0;
+}
+
+.stepDescription {
+  color: #b0b0b0;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* Model Selection Styles */
+.searchBox {
+  margin-bottom: 20px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px;
+  background: #404040;
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.modelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.modelCard {
+  background: #404040;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modelCard:hover {
+  border-color: #007acc;
+  background: #454545;
+}
+
+.modelCard.selected {
+  border-color: #007acc;
+  background: #2d3748;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.3);
+}
+
+.modelName {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #e0e0e0;
+}
+
+.modelDescription {
+  font-size: 13px;
+  color: #b0b0b0;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.modelMetadata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.modelSize {
+  font-size: 12px;
+  color: #16a085;
+  font-weight: 500;
+}
+
+.modelHardware {
+  font-size: 12px;
+  color: #f39c12;
+}
+
+/* Cluster Selection Styles */
+.deploymentSummary {
+  background: #404040;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.summaryTitle {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #e0e0e0;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.summaryLabel {
+  color: #b0b0b0;
+}
+
+.summaryValue {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.clusterList {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #555;
+  border-radius: 8px;
+}
+
+.clusterItem {
+  padding: 16px;
+  border-bottom: 1px solid #555;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clusterItem:last-child {
+  border-bottom: none;
+}
+
+.clusterItem:hover {
+  background: #454545;
+}
+
+.clusterItem.selected {
+  background: #2d3748;
+  border-left: 4px solid #007acc;
+}
+
+.clusterName {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #e0e0e0;
+}
+
+.clusterLocation {
+  font-size: 13px;
+  color: #b0b0b0;
+  margin-bottom: 8px;
+}
+
+.clusterSpecs {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+}
+
+.specItem {
+  color: #16a085;
+}
+
+/* YAML Section */
+.yamlSection {
+  margin-top: 24px;
+}
+
+.yamlTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #e0e0e0;
+}
+
+.yamlPreview {
+  background: #1e1e1e;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 16px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #e0e0e0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Button Styles */
+.button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.button.primary {
+  background: #007acc;
+  color: white;
+}
+
+.button.primary:hover:not(:disabled) {
+  background: #005a9e;
+}
+
+.button.primary:disabled {
+  background: #555;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.button.secondary {
+  background: #404040;
+  color: #e0e0e0;
+  border: 1px solid #555;
+}
+
+.button.secondary:hover {
+  background: #4a4a4a;
+}
+
+.button.configure {
+  padding: 6px 12px;
+  font-size: 12px;
+  background: #007acc;
+  color: white;
+}
+
+.button.configure:hover {
+  background: #005a9e;
+}
+
+/* Wizard Actions */
+.wizardActions {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px;
+  border-top: 1px solid #404040;
+  gap: 12px;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #2d2d2d;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #404040;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 24px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.closeButton:hover {
+  background: #404040;
+  color: #e0e0e0;
+}
+
+.modalContent {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #404040;
+}
+
+/* Form Styles */
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.formInput,
+.formSelect {
+  width: 100%;
+  padding: 10px 12px;
+  background: #404040;
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.formInput:focus,
+.formSelect:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.formSelect {
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .wizardContainer {
+    margin: 10px;
+    width: auto;
+  }
+  
+  .stepIndicator {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .step {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modelGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .wizardActions {
+    flex-direction: column;
+  }
+  
+  .summaryRow {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .modal {
+    width: 95vw;
+    margin: 10px;
+  }
+}

@@ -1,0 +1,387 @@
+.wizardContainer {
+  width: 900px;
+  max-width: 95vw;
+  background: #2d2d2d;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  margin: 20px auto;
+}
+
+.wizardHeader {
+  background: linear-gradient(135deg, #007acc, #005a9e);
+  padding: 24px;
+  text-align: center;
+  color: white;
+}
+
+.wizardTitle {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.wizardSubtitle {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.stepIndicator {
+  display: flex;
+  justify-content: center;
+  margin: 24px;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: #007acc;
+  color: white;
+}
+
+.step.completed {
+  background: #16a085;
+  color: white;
+}
+
+.step.inactive {
+  background: #404040;
+  color: #a0a0a0;
+}
+
+.stepNumber {
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.step.completed .stepNumber {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.wizardContent {
+  padding: 24px;
+}
+
+.stepContent {
+  display: none;
+}
+
+.stepContent.active {
+  display: block;
+}
+
+.stepTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #e0e0e0;
+}
+
+.stepDescription {
+  color: #b0b0b0;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* Model Selection Styles */
+.searchBox {
+  margin-bottom: 20px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px;
+  background: #404040;
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.modelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.modelCard {
+  background: #404040;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modelCard:hover {
+  border-color: #007acc;
+  background: #454545;
+}
+
+.modelCard.selected {
+  border-color: #007acc;
+  background: #2d3748;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.3);
+}
+
+.modelName {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #e0e0e0;
+}
+
+.modelDescription {
+  font-size: 13px;
+  color: #b0b0b0;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.modelMetadata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.modelSize {
+  font-size: 12px;
+  color: #16a085;
+  font-weight: 500;
+}
+
+.modelTuningSupport {
+  font-size: 12px;
+  color: #f39c12;
+}
+
+/* Fine-tuning Configuration Styles */
+.configSection {
+  background: #404040;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.configTitle {
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.configIcon {
+  width: 16px;
+  height: 16px;
+  background: #007acc;
+  border-radius: 50%;
+}
+
+.methodSelection {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.methodCard {
+  flex: 1;
+  background: #555;
+  border: 2px solid #555;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.methodCard:hover {
+  border-color: #007acc;
+}
+
+.methodCard.selected {
+  border-color: #007acc;
+  background: #2d3748;
+}
+
+.methodName {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #e0e0e0;
+}
+
+.methodDescription {
+  font-size: 12px;
+  color: #b0b0b0;
+  line-height: 1.4;
+}
+
+/* Form Styles */
+.formRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #e0e0e0;
+}
+
+.formInput, .formSelect, .formTextarea {
+  width: 100%;
+  padding: 10px;
+  background: #555;
+  border: 1px solid #666;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.formInput:focus, .formSelect:focus, .formTextarea:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.formHelp {
+  font-size: 12px;
+  color: #b0b0b0;
+  margin-top: 4px;
+}
+
+/* Dataset Input Styles */
+.datasetInput {
+  background: #404040;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+/* Action Buttons */
+.wizardActions {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px;
+  border-top: 1px solid #555;
+}
+
+.rightButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button:disabled {
+  background: #555 !important;
+  color: #999 !important;
+  cursor: not-allowed;
+}
+
+.button.primary {
+  background: #007acc;
+  color: white;
+}
+
+.button.primary:hover:not(:disabled) {
+  background: #005a9e;
+}
+
+.button.secondary {
+  background: #555;
+  color: #e0e0e0;
+}
+
+.button.secondary:hover:not(:disabled) {
+  background: #666;
+}
+
+.button.success {
+  background: #16a085;
+  color: white;
+}
+
+.button.success:hover:not(:disabled) {
+  background: #138d75;
+}
+
+@media (max-width: 768px) {
+  .wizardContainer {
+    margin: 10px;
+    width: calc(100vw - 20px);
+  }
+  
+  .stepIndicator {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .step {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .modelGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .methodSelection {
+    flex-direction: column;
+  }
+  
+  .formRow {
+    flex-direction: column;
+  }
+  
+  .wizardActions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .rightButtons {
+    justify-content: flex-end;
+  }
+}

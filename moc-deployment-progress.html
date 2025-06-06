@@ -393,10 +393,32 @@
                             Version: 0.3.0
                         </div>
                     </div>
+                </div>                <div class="step-item" id="step3">
+                    <div class="step-icon">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Create GPU Nodepool</div>
+                        <div class="step-description">Creating dedicated GPU nodepool for AI model workloads</div>
+                        <div class="step-details">
+                            Creating nodepool with Standard_NC24ads_A100_v4 instances<br>
+                            Configuring autoscaling settings: min=0, max=3
+                        </div>
+                    </div>
                 </div>
 
-                <div class="step-item" id="step3">
-                    <div class="step-icon">3</div>
+                <div class="step-item" id="step4">
+                    <div class="step-icon">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Label Node and Get Node Name</div>
+                        <div class="step-description">Labeling GPU nodes and retrieving node information for scheduling</div>
+                        <div class="step-details">
+                            Applying labels: kaito.sh/machine-type=Standard_NC24ads_A100_v4<br>
+                            Getting node names for workload placement
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step5">
+                    <div class="step-icon">5</div>
                     <div class="step-content">
                         <div class="step-title">Generating Configuration</div>
                         <div class="step-description">Creating Kubernetes manifests based on your deployment settings</div>
@@ -407,8 +429,8 @@
                     </div>
                 </div>
 
-                <div class="step-item" id="step4">
-                    <div class="step-icon">4</div>
+                <div class="step-item" id="step6">
+                    <div class="step-icon">6</div>
                     <div class="step-content">
                         <div class="step-title">Applying Configuration</div>
                         <div class="step-description">Deploying the model configuration to your cluster</div>
@@ -419,8 +441,8 @@
                     </div>
                 </div>
 
-                <div class="step-item" id="step5">
-                    <div class="step-icon">5</div>
+                <div class="step-item" id="step7">
+                    <div class="step-icon">7</div>
                     <div class="step-content">
                         <div class="step-title">Waiting for Pod Readiness</div>
                         <div class="step-description">Monitoring the deployment until the model is ready to serve requests</div>
@@ -491,9 +513,7 @@ data:
     <script>
         let currentStep = 1;
         let deploymentCompleted = false;
-        let deploymentCancelled = false;
-
-        // Deployment steps configuration
+        let deploymentCancelled = false;        // Deployment steps configuration
         const steps = [
             {
                 id: 'step1',
@@ -517,33 +537,55 @@ data:
             },
             {
                 id: 'step3',
-                title: 'Generating Configuration',
-                duration: 2000,
+                title: 'Create GPU Nodepool',
+                duration: 5000,
                 logs: [
-                    { time: '10:30:24', level: 'info', message: 'Generating Workspace manifest...' },
-                    { time: '10:30:25', level: 'info', message: 'Creating ConfigMap for inference parameters...' },
-                    { time: '10:30:26', level: 'info', message: 'Configuration files generated successfully' }
+                    { time: '10:30:24', level: 'info', message: 'Creating GPU nodepool for AI workloads...' },
+                    { time: '10:30:26', level: 'info', message: 'Configuring nodepool: Standard_NC24ads_A100_v4...' },
+                    { time: '10:30:28', level: 'info', message: 'Setting autoscaling: min=0, max=3...' },
+                    { time: '10:30:29', level: 'info', message: 'GPU nodepool created successfully' }
                 ]
             },
             {
                 id: 'step4',
-                title: 'Applying Configuration',
+                title: 'Label Node and Get Node Name',
                 duration: 3000,
                 logs: [
-                    { time: '10:30:27', level: 'info', message: 'Applying workspace configuration...' },
-                    { time: '10:30:28', level: 'info', message: 'Applying ConfigMap...' },
-                    { time: '10:30:29', level: 'info', message: 'Resources created successfully' }
+                    { time: '10:30:30', level: 'info', message: 'Waiting for GPU nodes to be ready...' },
+                    { time: '10:30:31', level: 'info', message: 'Applying node labels: kaito.sh/machine-type=Standard_NC24ads_A100_v4...' },
+                    { time: '10:30:32', level: 'info', message: 'Retrieved node name: aks-gpunodepool-12345678-vmss000000' },
+                    { time: '10:30:33', level: 'info', message: 'Node labeling completed successfully' }
                 ]
             },
             {
                 id: 'step5',
+                title: 'Generating Configuration',
+                duration: 2000,
+                logs: [
+                    { time: '10:30:34', level: 'info', message: 'Generating Workspace manifest...' },
+                    { time: '10:30:35', level: 'info', message: 'Creating ConfigMap for inference parameters...' },
+                    { time: '10:30:36', level: 'info', message: 'Configuration files generated successfully' }
+                ]
+            },
+            {
+                id: 'step6',
+                title: 'Applying Configuration',
+                duration: 3000,
+                logs: [
+                    { time: '10:30:37', level: 'info', message: 'Applying workspace configuration...' },
+                    { time: '10:30:38', level: 'info', message: 'Applying ConfigMap...' },
+                    { time: '10:30:39', level: 'info', message: 'Resources created successfully' }
+                ]
+            },
+            {
+                id: 'step7',
                 title: 'Waiting for Pod Readiness',
                 duration: 5000,
                 logs: [
-                    { time: '10:30:30', level: 'info', message: 'Waiting for pods to be scheduled...' },
-                    { time: '10:30:32', level: 'info', message: 'Pods are being created...' },
-                    { time: '10:30:34', level: 'info', message: 'Model container is starting...' },
-                    { time: '10:30:35', level: 'info', message: 'Deployment completed successfully!' }
+                    { time: '10:30:40', level: 'info', message: 'Waiting for pods to be scheduled...' },
+                    { time: '10:30:42', level: 'info', message: 'Pods are being created on GPU nodes...' },
+                    { time: '10:30:44', level: 'info', message: 'Model container is starting...' },
+                    { time: '10:30:45', level: 'info', message: 'Deployment completed successfully!' }
                 ]
             }
         ];
@@ -579,10 +621,8 @@ data:
                     addLogEntry(log.time, log.level, log.message);
                 }, index * 200);
             });
-        }
-
-        function startNextStep(stepNumber) {
-            if (stepNumber > 5) {
+        }        function startNextStep(stepNumber) {
+            if (stepNumber > 7) {
                 // All steps completed
                 deploymentCompleted = true;
                 document.getElementById('overallStatus').textContent = 'Completed';

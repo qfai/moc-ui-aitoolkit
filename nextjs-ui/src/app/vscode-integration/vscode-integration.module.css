@@ -1,0 +1,376 @@
+/* VS Code Integration Page Styles */
+.container {
+  min-height: 100vh;
+  background-color: var(--vscode-background);
+  color: var(--vscode-foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header {
+  background: linear-gradient(135deg, #007acc, #005a9e);
+  padding: 32px 24px;
+  text-align: center;
+  color: white;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding: 32px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.leftPanel,
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.section h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+/* Integration Steps */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.step.completed {
+  background-color: rgba(78, 201, 176, 0.1);
+  border-left: 3px solid #4EC9B0;
+}
+
+.step.active {
+  background-color: rgba(255, 204, 0, 0.1);
+  border-left: 3px solid #FFCC00;
+}
+
+.step.pending {
+  background-color: rgba(128, 128, 128, 0.1);
+  border-left: 3px solid #808080;
+}
+
+.stepIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--vscode-foreground);
+}
+
+.stepDescription {
+  font-size: 14px;
+  color: var(--vscode-foreground);
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.stepDetails {
+  font-size: 12px;
+  color: var(--vscode-foreground);
+  opacity: 0.6;
+}
+
+.stepDetail {
+  margin-bottom: 2px;
+}
+
+/* Connection Status */
+.connectionCard {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.connectionStatus {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.statusIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusIndicator.connected {
+  background-color: #4EC9B0;
+}
+
+.statusIndicator.connecting {
+  background-color: #FFCC00;
+  animation: pulse 1.5s infinite;
+}
+
+.statusIndicator.disconnected {
+  background-color: #F48771;
+}
+
+.statusText {
+  font-weight: 500;
+  color: var(--vscode-foreground);
+}
+
+.button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--vscode-button-hover-background);
+}
+
+.button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #555;
+  border-top: 2px solid var(--vscode-button-background);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.connectedInfo {
+  font-size: 13px;
+  color: var(--vscode-foreground);
+  opacity: 0.8;
+}
+
+.connectedInfo > div {
+  margin-bottom: 4px;
+}
+
+/* Workspaces */
+.workspaces {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.workspaceCard {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.workspaceCard:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--vscode-button-background);
+}
+
+.workspaceCard.selected {
+  border-color: var(--vscode-button-background);
+  background-color: rgba(0, 122, 204, 0.1);
+}
+
+.workspaceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.workspaceName {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--vscode-foreground);
+}
+
+.workspaceStatus {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.workspaceStatus.active {
+  background-color: #4EC9B0;
+  color: white;
+}
+
+.workspaceStatus.inactive {
+  background-color: #808080;
+  color: white;
+}
+
+.workspaceDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workspaceDetail {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.label {
+  color: var(--vscode-foreground);
+  opacity: 0.7;
+}
+
+.value {
+  color: var(--vscode-foreground);
+  font-weight: 500;
+}
+
+/* Quick Actions */
+.quickActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.actionButton:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--vscode-button-background);
+}
+
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.actionText {
+  flex: 1;
+}
+
+.actionTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--vscode-foreground);
+}
+
+.actionDescription {
+  font-size: 13px;
+  color: var(--vscode-foreground);
+  opacity: 0.7;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 24px 16px;
+  }
+  
+  .header {
+    padding: 24px 16px;
+  }
+  
+  .title {
+    font-size: 24px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+  
+  .section {
+    padding: 16px;
+  }
+  
+  .actionButton {
+    padding: 12px;
+  }
+}
