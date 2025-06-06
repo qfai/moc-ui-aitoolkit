@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaito Model Fine-Tuning Wizard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wizard-container {
+            width: 900px;
+            max-width: 95vw;
+            background: #2d2d2d;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }        .wizard-header {
+            background: linear-gradient(135deg, #007acc, #005a9e);
+            padding: 24px;
+            text-align: center;
+            color: white;
+        }
+
+        .wizard-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .wizard-subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 24px;
+            gap: 16px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }        .step.active {
+            background: #007acc;
+            color: white;
+        }
+
+        .step.completed {
+            background: #16a085;
+            color: white;
+        }
+
+        .step.inactive {
+            background: #404040;
+            color: #a0a0a0;
+        }
+
+        .step-number {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .step.completed .step-number {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .wizard-content {
+            padding: 24px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #e0e0e0;
+        }
+
+        .step-description {
+            color: #b0b0b0;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* Model Selection Styles */
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }        .search-input:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .model-card {
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }        .model-card:hover {
+            border-color: #007acc;
+            background: #454545;
+        }
+
+        .model-card.selected {
+            border-color: #007acc;
+            background: #2d3748;
+            box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.3);
+        }
+
+        .model-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+
+        .model-description {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .model-metadata {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .model-size {
+            font-size: 12px;
+            color: #16a085;
+            font-weight: 500;
+        }        .model-tuning-support {
+            font-size: 12px;
+            color: #f39c12;
+        }
+
+        /* Fine-tuning Configuration Styles */
+        .config-section {
+            background: #404040;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .config-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }        .config-icon {
+            width: 16px;
+            height: 16px;
+            background: #007acc;
+            border-radius: 50%;
+        }
+
+        .method-selection {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .method-card {
+            flex: 1;
+            background: #555;
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }        .method-card:hover {
+            border-color: #007acc;
+        }
+
+        .method-card.selected {
+            border-color: #007acc;
+            background: #2d3748;
+        }
+
+        .method-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+
+        .method-description {
+            font-size: 12px;
+            color: #b0b0b0;
+            line-height: 1.4;
+        }
+
+        /* Form Styles */
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            flex: 1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            background: #555;
+            border: 1px solid #666;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #b0b0b0;
+            margin-top: 4px;
+        }
+
+        /* Dataset Input Styles */
+        .dataset-input {
+            background: #404040;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .upload-area {
+            border: 2px dashed #666;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            background: #555;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }        .upload-area:hover {
+            border-color: #007acc;
+            background: #2d3748;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #007acc;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            color: #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .upload-help {
+            font-size: 12px;
+            color: #b0b0b0;
+        }
+
+        /* Cluster Selection Styles */
+        .deployment-summary {
+            background: #404040;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #e0e0e0;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .summary-label {
+            color: #b0b0b0;
+        }
+
+        .summary-value {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .cluster-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .cluster-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #555;
+            border-radius: 8px;
+        }
+
+        .cluster-item {
+            padding: 16px;
+            border-bottom: 1px solid #555;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .cluster-item:last-child {
+            border-bottom: none;
+        }
+
+        .cluster-item:hover {
+            background: #454545;
+        }        .cluster-item.selected {
+            background: #2d3748;
+            border-left: 4px solid #007acc;
+        }
+
+        .cluster-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #e0e0e0;
+        }
+
+        .cluster-location {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+        }
+
+        .cluster-specs {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+        }
+
+        .spec-item {
+            color: #16a085;
+        }
+
+        /* YAML Preview */
+        .yaml-preview {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #e0e0e0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Buttons */
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px;
+            border-top: 1px solid #555;
+        }
+
+        .button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }        .button.primary {
+            background: #007acc;
+            color: white;
+        }
+
+        .button.primary:hover {
+            background: #005a9e;
+        }
+
+        .button.primary:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .button.secondary {
+            background: #555;
+            color: #e0e0e0;
+        }
+
+        .button.secondary:hover {
+            background: #666;
+        }
+
+        .button.configure {
+            background: #16a085;
+            color: white;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+
+        .button.configure:hover {
+            background: #138d75;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Progress indicator */
+        .progress-indicator {
+            background: #404040;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #555;
+            border-radius: 4px;
+            overflow: hidden;
+        }        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007acc, #005a9e);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <div class="wizard-title">Fine-Tune AI Model with Kaito</div>
+            <div class="wizard-subtitle">Customize pre-trained models with your own data using LoRA and QLoRA</div>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <span>Base Model</span>
+            </div>
+            <div class="step inactive" data-step="2">
+                <div class="step-number">2</div>
+                <span>Configuration</span>
+            </div>
+            <div class="step inactive" data-step="3">
+                <div class="step-number">3</div>
+                <span>Data & Output</span>
+            </div>
+            <div class="step inactive" data-step="4">
+                <div class="step-number">4</div>
+                <span>Deploy</span>
+            </div>
+        </div>
+
+        <div class="wizard-content">
+            <!-- Step 1: Base Model Selection -->
+            <div class="step-content active" data-step="1">
+                <h2 class="step-title">Choose Base Model for Fine-Tuning</h2>
+                <p class="step-description">Select the pre-trained model you want to fine-tune. Different models have different capabilities and training requirements.</p>
+                
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label class="form-label">Fine-Tuning Job Name</label>
+                    <input type="text" class="form-input" id="jobName" value="my-finetune-job" placeholder="Enter job name" onchange="updateJobName(this.value)">
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search models..." onkeyup="filterModels(this.value)">
+                </div>
+
+                <div class="model-grid" id="modelGrid">
+                    <div class="model-card" data-model="falcon-7b" onclick="selectModel(this)">
+                        <div class="model-name">Falcon 7B</div>
+                        <div class="model-description">High-performance language model with strong reasoning capabilities, optimized for fine-tuning tasks.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">13.5 GB</div>
+                            <div class="model-tuning-support">LoRA + QLoRA</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="llama-2-7b" onclick="selectModel(this)">
+                        <div class="model-name">Llama 2 7B</div>
+                        <div class="model-description">Meta's powerful language model with excellent fine-tuning capabilities for various tasks.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">13.5 GB</div>
+                            <div class="model-tuning-support">LoRA + QLoRA</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="llama-2-13b" onclick="selectModel(this)">
+                        <div class="model-name">Llama 2 13B</div>
+                        <div class="model-description">Larger version of Llama 2 with enhanced capabilities, suitable for complex fine-tuning tasks.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">26 GB</div>
+                            <div class="model-tuning-support">LoRA + QLoRA</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="mistral-7b" onclick="selectModel(this)">
+                        <div class="model-name">Mistral 7B</div>
+                        <div class="model-description">Efficient and powerful model with excellent fine-tuning performance across multiple domains.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">14.2 GB</div>
+                            <div class="model-tuning-support">LoRA + QLoRA</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="phi-3-mini" onclick="selectModel(this)">
+                        <div class="model-name">Phi-3 Mini</div>
+                        <div class="model-description">Microsoft's compact yet powerful model, ideal for resource-efficient fine-tuning.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">2.4 GB</div>
+                            <div class="model-tuning-support">LoRA + QLoRA</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="phi-3-medium" onclick="selectModel(this)">
+                        <div class="model-name">Phi-3 Medium</div>
+                        <div class="model-description">Balanced performance and efficiency with strong fine-tuning capabilities.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">8.4 GB</div>
+                            <div class="model-tuning-support">LoRA + QLoRA</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Fine-Tuning Configuration -->
+            <div class="step-content" data-step="2">
+                <h2 class="step-title">Fine-Tuning Configuration</h2>
+                <p class="step-description">Configure the fine-tuning method and parameters for optimal training performance.</p>
+
+                <div class="config-section">
+                    <div class="config-title">
+                        <div class="config-icon"></div>
+                        Training Method
+                    </div>
+                    <div class="method-selection">
+                        <div class="method-card" data-method="qlora" onclick="selectMethod(this)">
+                            <div class="method-name">QLoRA</div>
+                            <div class="method-description">Quantized Low-Rank Adaptation. Memory-efficient fine-tuning with 4-bit quantization.</div>
+                        </div>
+                        <div class="method-card" data-method="lora" onclick="selectMethod(this)">
+                            <div class="method-name">LoRA</div>
+                            <div class="method-description">Low-Rank Adaptation. Efficient fine-tuning by updating only a small subset of parameters.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-title">
+                        <div class="config-icon"></div>
+                        Training Parameters
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">LoRA Alpha</label>
+                            <input type="number" class="form-input" id="loraAlpha" value="32" min="1" max="256">
+                            <div class="form-help">Controls the scaling of LoRA updates</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">LoRA Rank</label>
+                            <input type="number" class="form-input" id="loraRank" value="16" min="1" max="128">
+                            <div class="form-help">Rank of the adaptation matrices</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Learning Rate</label>
+                            <input type="number" class="form-input" id="learningRate" value="2e-4" step="1e-5" min="1e-6" max="1e-2">
+                            <div class="form-help">Learning rate for the optimizer</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Batch Size</label>
+                            <select class="form-select" id="batchSize">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="4" selected>4</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Number of Epochs</label>
+                            <input type="number" class="form-input" id="numEpochs" value="3" min="1" max="20">
+                            <div class="form-help">Number of training epochs</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Sequence Length</label>
+                            <select class="form-select" id="maxLength">
+                                <option value="512">512</option>
+                                <option value="1024" selected>1024</option>
+                                <option value="2048">2048</option>
+                                <option value="4096">4096</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="quantizationConfig" style="display: none;">
+                        <label class="form-label">Quantization Bits</label>
+                        <select class="form-select" id="quantBits">
+                            <option value="4" selected>4-bit</option>
+                            <option value="8">8-bit</option>
+                        </select>
+                        <div class="form-help">Quantization precision for QLoRA</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Data & Output Configuration -->
+            <div class="step-content" data-step="3">
+                <h2 class="step-title">Dataset & Output Configuration</h2>
+                <p class="step-description">Specify your training dataset and configure the output adapter location.</p>
+
+                <div class="config-section">
+                    <div class="config-title">
+                        <div class="config-icon"></div>
+                        Input Dataset
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Dataset Source</label>
+                        <select class="form-select" id="datasetSource" onchange="toggleDatasetInput(this.value)">
+                            <option value="registry">Container Registry</option>
+                            <option value="upload">Upload File</option>
+                        </select>
+                    </div>
+
+                    <div id="registryInput">
+                        <div class="form-group">
+                            <label class="form-label">Dataset Image</label>
+                            <input type="text" class="form-input" id="datasetImage" placeholder="PULLREGISTRY/DATA_NAME_HERE:0.0.1">
+                            <div class="form-help">Container image containing your training dataset</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Image Pull Secret (Optional)</label>
+                            <input type="text" class="form-input" id="imagePullSecret" placeholder="my-registry-secret">
+                            <div class="form-help">Secret for private registry authentication</div>
+                        </div>
+                    </div>
+
+                    <div id="uploadInput" class="dataset-input" style="display: none;">
+                        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📁</div>
+                            <div class="upload-text">Click to upload dataset</div>
+                            <div class="upload-help">Supports JSON, JSONL, CSV formats</div>
+                        </div>
+                        <input type="file" id="fileInput" style="display: none;" accept=".json,.jsonl,.csv" onchange="handleFileUpload(this)">
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-title">
+                        <div class="config-icon"></div>
+                        Output Configuration
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Output Adapter Image</label>
+                        <input type="text" class="form-input" id="outputImage" placeholder="PUSHREGISTRY/ADAPTER_NAME_HERE:0.0.1">
+                        <div class="form-help">Where to push the fine-tuned adapter</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Image Push Secret</label>
+                        <input type="text" class="form-input" id="imagePushSecret" placeholder="my-push-secret">
+                        <div class="form-help">Secret for pushing to the output registry</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Deploy -->
+            <div class="step-content" data-step="4">
+                <h2 class="step-title">Review & Deploy Fine-Tuning Job</h2>
+                <p class="step-description">Review your configuration and deploy the fine-tuning job to your Kubernetes cluster.</p>
+
+                <div class="deployment-summary">
+                    <div class="summary-title">Job Configuration</div>
+                    <div class="summary-row">
+                        <span class="summary-label">Job Name:</span>
+                        <span class="summary-value" id="finalJobName">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Base Model:</span>
+                        <span class="summary-value" id="finalModel">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Method:</span>
+                        <span class="summary-value" id="finalMethod">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Instance Type:</span>
+                        <span class="summary-value" id="finalInstanceType">Standard_NC24ads_A100_v4</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Dataset:</span>
+                        <span class="summary-value" id="finalDataset">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Output:</span>
+                        <span class="summary-value" id="finalOutput">-</span>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-title">
+                        <div class="config-icon"></div>
+                        Generated YAML Configuration
+                    </div>
+                    <div class="yaml-preview" id="yamlPreview">
+# Configuration will be generated here...
+                    </div>
+                </div>
+
+                <div class="progress-indicator" id="deploymentProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Preparing deployment...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-actions">
+            <button class="button secondary" id="backButton" onclick="previousStep()" style="display: none;">Back</button>
+            <div>
+                <button class="button secondary" onclick="window.close()">Cancel</button>
+                <button class="button primary" id="nextButton" onclick="nextStep()" disabled>Next Step</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentStep = 1;
+        let selectedModel = null;
+        let selectedMethod = 'qlora';
+        let finetuneConfig = {
+            jobName: 'my-finetune-job',
+            loraAlpha: 32,
+            loraRank: 16,
+            learningRate: 2e-4,
+            batchSize: 4,
+            numEpochs: 3,
+            maxLength: 1024,
+            quantBits: 4,
+            datasetImage: '',
+            imagePullSecret: '',
+            outputImage: '',
+            imagePushSecret: '',
+            instanceType: 'Standard_NC24ads_A100_v4'
+        };
+
+        // Model data
+        const modelData = {
+            'falcon-7b': { name: 'Falcon 7B', size: '13.5 GB', description: 'High-performance language model with strong reasoning capabilities' },
+            'llama-2-7b': { name: 'Llama 2 7B', size: '13.5 GB', description: 'Meta\'s powerful language model with excellent fine-tuning capabilities' },
+            'llama-2-13b': { name: 'Llama 2 13B', size: '26 GB', description: 'Larger version of Llama 2 with enhanced capabilities' },
+            'mistral-7b': { name: 'Mistral 7B', size: '14.2 GB', description: 'Efficient and powerful model with excellent fine-tuning performance' },
+            'phi-3-mini': { name: 'Phi-3 Mini', size: '2.4 GB', description: 'Microsoft\'s compact yet powerful model' },
+            'phi-3-medium': { name: 'Phi-3 Medium', size: '8.4 GB', description: 'Balanced performance and efficiency' }
+        };
+
+        // Initialize wizard
+        function initWizard() {
+            updateStepIndicator();
+            updateButtons();
+        }
+
+        // Step navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                if (currentStep === 1 && !selectedModel) return;
+                if (currentStep === 2) collectConfig();
+                if (currentStep === 3) collectDataConfig();
+                
+                currentStep++;
+                showStep(currentStep);
+                updateStepIndicator();
+                updateButtons();
+                
+                if (currentStep === 4) {
+                    updateFinalSummary();
+                    generateYAML();
+                }
+            } else {
+                // Deploy
+                deployFinetuneJob();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                updateStepIndicator();
+                updateButtons();
+            }
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelector(`.step-content[data-step="${step}"]`).classList.add('active');
+        }
+
+        function updateStepIndicator() {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNumber = index + 1;
+                step.classList.remove('active', 'completed', 'inactive');
+                
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.add('inactive');
+                }
+            });
+        }
+
+        function updateButtons() {
+            const backButton = document.getElementById('backButton');
+            const nextButton = document.getElementById('nextButton');
+            
+            backButton.style.display = currentStep > 1 ? 'block' : 'none';
+            
+            if (currentStep === 1) {
+                nextButton.disabled = !selectedModel;
+                nextButton.textContent = 'Next Step';
+            } else if (currentStep < 4) {
+                nextButton.disabled = false;
+                nextButton.textContent = 'Next Step';
+            } else {
+                nextButton.disabled = false;
+                nextButton.textContent = 'Start Fine-Tuning';
+            }
+        }
+
+        // Model selection
+        function selectModel(card) {
+            document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedModel = card.dataset.model;
+            updateButtons();
+        }
+
+        function updateJobName(name) {
+            finetuneConfig.jobName = name;
+        }
+
+        function filterModels(query) {
+            const cards = document.querySelectorAll('.model-card');
+            cards.forEach(card => {
+                const name = card.querySelector('.model-name').textContent.toLowerCase();
+                const description = card.querySelector('.model-description').textContent.toLowerCase();
+                const visible = name.includes(query.toLowerCase()) || description.includes(query.toLowerCase());
+                card.style.display = visible ? 'block' : 'none';
+            });
+        }
+
+        // Method selection
+        function selectMethod(card) {
+            document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedMethod = card.dataset.method;
+            
+            // Show/hide quantization config
+            const quantConfig = document.getElementById('quantizationConfig');
+            quantConfig.style.display = selectedMethod === 'qlora' ? 'block' : 'none';
+        }
+
+        // Configuration collection
+        function collectConfig() {
+            finetuneConfig.loraAlpha = parseInt(document.getElementById('loraAlpha').value);
+            finetuneConfig.loraRank = parseInt(document.getElementById('loraRank').value);
+            finetuneConfig.learningRate = parseFloat(document.getElementById('learningRate').value);
+            finetuneConfig.batchSize = parseInt(document.getElementById('batchSize').value);
+            finetuneConfig.numEpochs = parseInt(document.getElementById('numEpochs').value);
+            finetuneConfig.maxLength = parseInt(document.getElementById('maxLength').value);
+            finetuneConfig.quantBits = parseInt(document.getElementById('quantBits').value);
+        }
+
+        function collectDataConfig() {
+            finetuneConfig.datasetImage = document.getElementById('datasetImage').value;
+            finetuneConfig.imagePullSecret = document.getElementById('imagePullSecret').value;
+            finetuneConfig.outputImage = document.getElementById('outputImage').value;
+            finetuneConfig.imagePushSecret = document.getElementById('imagePushSecret').value;
+        }
+
+        // Dataset input toggle
+        function toggleDatasetInput(source) {
+            const registryInput = document.getElementById('registryInput');
+            const uploadInput = document.getElementById('uploadInput');
+            
+            if (source === 'registry') {
+                registryInput.style.display = 'block';
+                uploadInput.style.display = 'none';
+            } else {
+                registryInput.style.display = 'none';
+                uploadInput.style.display = 'block';
+            }
+        }
+
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const uploadText = document.querySelector('.upload-text');
+                uploadText.textContent = `Selected: ${file.name}`;
+            }
+        }
+
+        // Final summary update
+        function updateFinalSummary() {
+            document.getElementById('finalJobName').textContent = finetuneConfig.jobName;
+            document.getElementById('finalModel').textContent = selectedModel ? modelData[selectedModel].name : '-';
+            document.getElementById('finalMethod').textContent = selectedMethod.toUpperCase();
+            document.getElementById('finalDataset').textContent = finetuneConfig.datasetImage || 'Upload file';
+            document.getElementById('finalOutput').textContent = finetuneConfig.outputImage || 'Not configured';
+        }
+
+        // YAML generation
+        function generateYAML() {
+            const yaml = `apiVersion: kaito.sh/v1beta1
+kind: Workspace
+metadata:
+  name: ${finetuneConfig.jobName}
+spec:
+  resource:
+    instanceType: "${finetuneConfig.instanceType}"
+    labelSelector:
+      matchLabels:
+        app: ${finetuneConfig.jobName}
+  tuning:
+    preset:
+      name: ${selectedModel}
+    method: ${selectedMethod}
+    config:
+      loraAlpha: ${finetuneConfig.loraAlpha}
+      loraRank: ${finetuneConfig.loraRank}
+      learningRate: ${finetuneConfig.learningRate}
+      batchSize: ${finetuneConfig.batchSize}
+      numEpochs: ${finetuneConfig.numEpochs}
+      maxLength: ${finetuneConfig.maxLength}${selectedMethod === 'qlora' ? `
+      quantizationBits: ${finetuneConfig.quantBits}` : ''}
+    input:
+      image: ${finetuneConfig.datasetImage}${finetuneConfig.imagePullSecret ? `
+      imagePullSecrets:
+        - ${finetuneConfig.imagePullSecret}` : ''}
+    output:
+      image: ${finetuneConfig.outputImage}
+      imagePushSecret: ${finetuneConfig.imagePushSecret}`;
+
+            document.getElementById('yamlPreview').textContent = yaml;
+        }
+
+        // Deployment
+        function deployFinetuneJob() {
+            const progressDiv = document.getElementById('deploymentProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressDiv.style.display = 'block';
+            
+            // Simulate deployment progress
+            let progress = 0;
+            const steps = [
+                'Validating configuration...',
+                'Creating workspace resource...',
+                'Scheduling training job...',
+                'Initializing model...',
+                'Starting fine-tuning...'
+            ];
+            
+            const interval = setInterval(() => {
+                progress += 20;
+                progressFill.style.width = progress + '%';
+                
+                if (progress <= 100) {
+                    const stepIndex = Math.floor(progress / 20) - 1;
+                    if (stepIndex >= 0 && stepIndex < steps.length) {
+                        progressText.textContent = steps[stepIndex];
+                    }
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressText.textContent = 'Fine-tuning job started successfully!';
+                    setTimeout(() => {
+                        alert(`Fine-tuning job "${finetuneConfig.jobName}" has been deployed!\n\nThe job will run on ${finetuneConfig.instanceType} instances and the adapter will be saved to:\n${finetuneConfig.outputImage}`);
+                    }, 1000);
+                }
+            }, 800);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initWizard();
+            // Pre-select QLoRA method
+            document.querySelector('[data-method="qlora"]').click();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaito Model Deployment Wizard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wizard-container {
+            width: 900px;
+            max-width: 95vw;
+            background: #2d2d2d;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .wizard-header {
+            background: linear-gradient(135deg, #007acc, #005a9e);
+            padding: 24px;
+            text-align: center;
+            color: white;
+        }
+
+        .wizard-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .wizard-subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 24px;
+            gap: 16px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #007acc;
+            color: white;
+        }
+
+        .step.completed {
+            background: #16a085;
+            color: white;
+        }
+
+        .step.inactive {
+            background: #404040;
+            color: #a0a0a0;
+        }
+
+        .step-number {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .step.completed .step-number {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .wizard-content {
+            padding: 24px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #e0e0e0;
+        }
+
+        .step-description {
+            color: #b0b0b0;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* Model Selection Styles */
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .model-card {
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .model-card:hover {
+            border-color: #007acc;
+            background: #454545;
+        }
+
+        .model-card.selected {
+            border-color: #007acc;
+            background: #2d3748;
+            box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.3);
+        }
+
+        .model-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+
+        .model-description {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .model-metadata {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .model-size {
+            font-size: 12px;
+            color: #16a085;
+            font-weight: 500;
+        }
+
+        .model-hardware {
+            font-size: 12px;
+            color: #f39c12;
+        }
+
+        /* Cluster Selection Styles */
+        .deployment-summary {
+            background: #404040;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #e0e0e0;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .summary-label {
+            color: #b0b0b0;
+        }
+
+        .summary-value {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .cluster-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .cluster-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #555;
+            border-radius: 8px;
+        }
+
+        .cluster-item {
+            padding: 16px;
+            border-bottom: 1px solid #555;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .cluster-item:last-child {
+            border-bottom: none;
+        }
+
+        .cluster-item:hover {
+            background: #454545;
+        }
+
+        .cluster-item.selected {
+            background: #2d3748;
+            border-left: 4px solid #007acc;
+        }
+
+        .cluster-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #e0e0e0;
+        }
+
+        .cluster-location {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+        }
+
+        .cluster-specs {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+        }
+
+        .spec-item {
+            color: #16a085;
+        }
+
+        /* Configuration Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 24px;
+            width: 500px;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        /* Buttons */
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px;
+            border-top: 1px solid #555;
+        }
+
+        .button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button.primary {
+            background: #007acc;
+            color: white;
+        }
+
+        .button.primary:hover {
+            background: #005a9e;
+        }
+
+        .button.primary:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .button.secondary {
+            background: #555;
+            color: #e0e0e0;
+        }
+
+        .button.secondary:hover {
+            background: #666;
+        }
+
+        .button.configure {
+            background: #16a085;
+            color: white;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+
+        .button.configure:hover {
+            background: #138d75;
+        }        .hidden {
+            display: none !important;
+        }
+
+        /* YAML Preview */
+        .yaml-preview {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #e0e0e0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .config-section {
+            background: #404040;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .config-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .config-icon {
+            width: 16px;
+            height: 16px;
+            background: #007acc;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <div class="wizard-title">Deploy AI Model with Kaito</div>
+            <div class="wizard-subtitle">Deploy and manage AI models on Azure Kubernetes Service</div>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <span>Choose Model</span>
+            </div>
+            <div class="step inactive" data-step="2">
+                <div class="step-number">2</div>
+                <span>Select Cluster</span>
+            </div>
+            <div class="step inactive" data-step="3">
+                <div class="step-number">3</div>
+                <span>Deploy</span>
+            </div>
+        </div>
+
+        <div class="wizard-content">            <!-- Step 1: Model Selection -->
+            <div class="step-content active" data-step="1">
+                <h2 class="step-title">Choose Your AI Model</h2>
+                <p class="step-description">Select the AI model you want to deploy. Each model has different capabilities and resource requirements.</p>
+                
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label class="form-label">Deployment Name</label>
+                    <input type="text" class="form-input" id="deploymentNameMain" value="My LLM Deployment" placeholder="Enter deployment name" onchange="updateDeploymentName(this.value)">
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search models..." onkeyup="filterModels(this.value)">
+                </div>
+
+                <div class="model-grid" id="modelGrid">                    <div class="model-card" data-model="microsoft/phi-silica" onclick="selectModel(this)">
+                        <div class="model-name">Microsoft Phi Silica</div>
+                        <div class="model-description">Small, efficient language model optimized for edge deployment with strong reasoning capabilities.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">1.3 GB</div>
+                            <div class="model-hardware">GPU Required</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="microsoft/phi-3-mini" onclick="selectModel(this)">
+                        <div class="model-name">Microsoft Phi-3 Mini</div>
+                        <div class="model-description">Lightweight 3.8B parameter model with strong performance on language tasks and coding.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">2.4 GB</div>
+                            <div class="model-hardware">GPU Required</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="microsoft/phi-3-medium" onclick="selectModel(this)">
+                        <div class="model-name">Microsoft Phi-3 Medium</div>
+                        <div class="model-description">Balanced 14B parameter model offering improved capabilities while maintaining efficiency.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">8.4 GB</div>
+                            <div class="model-hardware">GPU Required</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="meta-llama/llama-2-7b" onclick="selectModel(this)">
+                        <div class="model-name">Llama 2 7B</div>
+                        <div class="model-description">Meta's 7B parameter foundation model with strong general language capabilities.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">13.5 GB</div>
+                            <div class="model-hardware">GPU Required</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="mistralai/mistral-7b" onclick="selectModel(this)">
+                        <div class="model-name">Mistral 7B</div>
+                        <div class="model-description">High-performance 7B model with excellent instruction following and code generation.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">14.2 GB</div>
+                            <div class="model-hardware">GPU Required</div>
+                        </div>
+                    </div>                    <div class="model-card" data-model="microsoft/dialoGPT-medium" onclick="selectModel(this)">
+                        <div class="model-name">DialoGPT Medium</div>
+                        <div class="model-description">Conversational AI model trained on Reddit conversations for dialogue generation.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">1.7 GB</div>
+                            <div class="model-hardware">GPU Required</div>
+                        </div>
+                    </div>
+
+                    <div class="model-card" data-model="deepseek-r1-distill-qwen-14b" onclick="selectModel(this)">
+                        <div class="model-name">DeepSeek R1 Distill Qwen 14B</div>
+                        <div class="model-description">Advanced reasoning model with strong performance across multiple domains and tasks.</div>
+                        <div class="model-metadata">
+                            <div class="model-size">28 GB</div>
+                            <div class="model-hardware">GPU Required</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Cluster Selection -->
+            <div class="step-content" data-step="2">
+                <h2 class="step-title">Select Deployment Target</h2>
+                <p class="step-description">Choose the Kubernetes cluster where you want to deploy your model.</p>                <div class="deployment-summary" id="deploymentSummary">
+                    <div class="summary-title">Deployment Summary</div>
+                    <div class="summary-row">
+                        <span class="summary-label">Deployment Name:</span>
+                        <span class="summary-value" id="selectedDeploymentName">My LLM Deployment</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Selected Model:</span>
+                        <span class="summary-value" id="selectedModelName">None</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Model Size:</span>
+                        <span class="summary-value" id="selectedModelSize">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Instance Type:</span>
+                        <span class="summary-value" id="selectedInstanceType">Standard_NK6 (1 GPU, 8GB, NVIDIA T4)</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Configuration:</span>
+                        <span class="summary-value">
+                            <button class="button configure" onclick="openConfigModal()">Configure</button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="cluster-filters">
+                    <select class="filter-select" onchange="filterClusters()">
+                        <option value="">All Resource Groups</option>
+                        <option value="rg-prod-east">rg-prod-east</option>
+                        <option value="rg-dev-west">rg-dev-west</option>
+                        <option value="rg-staging">rg-staging</option>
+                    </select>
+                    <select class="filter-select" onchange="filterClusters()">
+                        <option value="">All Regions</option>
+                        <option value="eastus">East US</option>
+                        <option value="westus2">West US 2</option>
+                        <option value="westeurope">West Europe</option>
+                    </select>                    <select class="filter-select" onchange="filterClusters()">
+                        <option value="">All Hardware</option>
+                        <option value="gpu">GPU Enabled</option>
+                    </select>
+                </div>
+
+                <div class="cluster-list" id="clusterList">
+                    <div class="cluster-item" data-cluster="prod-east-cluster" onclick="selectCluster(this)">
+                        <div class="cluster-name">prod-east-cluster</div>
+                        <div class="cluster-location">East US • rg-prod-east</div>
+                        <div class="cluster-specs">
+                            <span class="spec-item">16 vCPUs</span>
+                            <span class="spec-item">64 GB RAM</span>
+                            <span class="spec-item">4x NVIDIA V100</span>
+                        </div>
+                    </div>
+
+                    <div class="cluster-item" data-cluster="dev-west-cluster" onclick="selectCluster(this)">
+                        <div class="cluster-name">dev-west-cluster</div>
+                        <div class="cluster-location">West US 2 • rg-dev-west</div>
+                        <div class="cluster-specs">
+                            <span class="spec-item">8 vCPUs</span>
+                            <span class="spec-item">32 GB RAM</span>
+                            <span class="spec-item">2x NVIDIA T4</span>
+                        </div>
+                    </div>                    <div class="cluster-item" data-cluster="staging-cluster" onclick="selectCluster(this)">
+                        <div class="cluster-name">staging-cluster</div>
+                        <div class="cluster-location">West Europe • rg-staging</div>
+                        <div class="cluster-specs">
+                            <span class="spec-item">12 vCPUs</span>
+                            <span class="spec-item">48 GB RAM</span>
+                            <span class="spec-item">2x NVIDIA A2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>            <!-- Step 3: Deploy -->
+            <div class="step-content" data-step="3">
+                <h2 class="step-title">Review & Deploy Model</h2>
+                <p class="step-description">Review your deployment configuration and click Deploy to start the deployment process.</p>
+
+                <div class="deployment-summary">
+                    <div class="summary-title">Final Configuration</div>
+                    <div class="summary-row">
+                        <span class="summary-label">Deployment Name:</span>
+                        <span class="summary-value" id="finalDeploymentName">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Model:</span>
+                        <span class="summary-value" id="finalModelName">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Cluster:</span>
+                        <span class="summary-value" id="finalClusterName">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Instance Type:</span>
+                        <span class="summary-value" id="finalInstanceType">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Replicas:</span>
+                        <span class="summary-value" id="finalReplicas">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Memory Limit:</span>
+                        <span class="summary-value" id="finalMemoryLimit">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">CPU Limit:</span>
+                        <span class="summary-value" id="finalCpuLimit">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">GPU Memory Utilization:</span>
+                        <span class="summary-value" id="finalGpuMemoryUtilization">-</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Swap Space:</span>
+                        <span class="summary-value" id="finalSwapSpace">-</span>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-title">
+                        <div class="config-icon"></div>
+                        Generated YAML Configuration
+                    </div>
+                    <div class="yaml-preview" id="yamlPreview">
+# Configuration will be generated here...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-actions">
+            <button class="button secondary" id="backButton" onclick="previousStep()" style="display: none;">Back</button>
+            <div>
+                <button class="button secondary" onclick="window.close()">Cancel</button>
+                <button class="button primary" id="nextButton" onclick="nextStep()" disabled>Next Step</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Modal -->
+    <div class="modal-overlay" id="configModal">
+        <div class="modal-content">            <div class="modal-header">
+                <h3 class="modal-title">Deployment Configuration</h3>
+                <button class="close-button" onclick="closeConfigModal()">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Instance Type</label>
+                <select class="form-select" id="instanceType" onchange="updateInstanceTypeFromModal(this.value)">
+                    <!-- Options will be populated based on selected cluster -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Number of Replicas</label>
+                <select class="form-select" id="replicas">
+                    <option value="1">1 Replica</option>
+                    <option value="2">2 Replicas</option>
+                    <option value="3">3 Replicas</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Memory Limit (GB)</label>
+                <input type="number" class="form-input" id="memoryLimit" value="8" min="1" max="64">
+            </div>            <div class="form-group">
+                <label class="form-label">CPU Limit (cores)</label>
+                <input type="number" class="form-input" id="cpuLimit" value="4" min="1" max="16" step="0.5">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">GPU Memory Utilization</label>
+                <input type="number" class="form-input" id="gpuMemoryUtilization" value="0.95" min="0.1" max="1.0" step="0.05">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Swap Space (GB)</label>
+                <input type="number" class="form-input" id="swapSpace" value="4" min="0" max="64" step="0.5">
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="button secondary" onclick="closeConfigModal()">Cancel</button>
+                <button class="button primary" onclick="saveConfiguration()">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentStep = 1;
+        let selectedModel = null;
+        let selectedCluster = null;        let deploymentConfig = {
+            name: 'My LLM Deployment',
+            replicas: 1,
+            memoryLimit: 8,
+            cpuLimit: 4,
+            instanceType: 'Standard_NK6',
+            gpuMemoryUtilization: 0.95,
+            swapSpace: 4
+        };
+
+        // Instance type data
+        const instanceTypes = {
+            'Standard_NK6': { SKU: "Standard_NK6", GPUCount: 1, GPUMemGB: 8, GPUModel: "NVIDIA T4" },
+            'Standard_NK12': { SKU: "Standard_NK12", GPUCount: 2, GPUMemGB: 16, GPUModel: "NVIDIA T4" },
+            'Standard_NC4_A2': { SKU: "Standard_NC4_A2", GPUCount: 1, GPUMemGB: 16, GPUModel: "NVIDIA A2" },
+            'Standard_NC8_A2': { SKU: "Standard_NC8_A2", GPUCount: 1, GPUMemGB: 16, GPUModel: "NVIDIA A2" },
+            'Standard_NC16_A2': { SKU: "Standard_NC16_A2", GPUCount: 2, GPUMemGB: 32, GPUModel: "NVIDIA A2" },
+            'Standard_NC32_A2': { SKU: "Standard_NC32_A2", GPUCount: 2, GPUMemGB: 32, GPUModel: "NVIDIA A2" },
+            'Standard_NC4_A16': { SKU: "Standard_NC4_A16", GPUCount: 1, GPUMemGB: 16, GPUModel: "NVIDIA A16" },
+            'Standard_NC8_A16': { SKU: "Standard_NC8_A16", GPUCount: 1, GPUMemGB: 16, GPUModel: "NVIDIA A16" },
+            'Standard_NC16_A16': { SKU: "Standard_NC16_A16", GPUCount: 2, GPUMemGB: 32, GPUModel: "NVIDIA A16" },
+            'Standard_NC32_A16': { SKU: "Standard_NC32_A16", GPUCount: 2, GPUMemGB: 32, GPUModel: "NVIDIA A16" }
+        };
+
+        // Cluster to available instance types mapping
+        const clusterInstanceTypes = {
+            'prod-east-cluster': ['Standard_NK6', 'Standard_NK12', 'Standard_NC4_A16', 'Standard_NC8_A16', 'Standard_NC16_A16', 'Standard_NC32_A16'],
+            'dev-west-cluster': ['Standard_NK6', 'Standard_NK12', 'Standard_NC4_A2', 'Standard_NC8_A2'],
+            'staging-cluster': ['Standard_NK6', 'Standard_NC4_A2', 'Standard_NC8_A2', 'Standard_NC16_A2']
+        };        // Model data
+        const modelData = {
+            'microsoft/phi-silica': { name: 'Microsoft Phi Silica', size: '1.3 GB', hardware: 'GPU Required' },
+            'microsoft/phi-3-mini': { name: 'Microsoft Phi-3 Mini', size: '2.4 GB', hardware: 'GPU Required' },
+            'microsoft/phi-3-medium': { name: 'Microsoft Phi-3 Medium', size: '8.4 GB', hardware: 'GPU Required' },
+            'meta-llama/llama-2-7b': { name: 'Llama 2 7B', size: '13.5 GB', hardware: 'GPU Required' },
+            'mistralai/mistral-7b': { name: 'Mistral 7B', size: '14.2 GB', hardware: 'GPU Required' },
+            'microsoft/dialoGPT-medium': { name: 'DialoGPT Medium', size: '1.7 GB', hardware: 'GPU Required' },
+            'deepseek-r1-distill-qwen-14b': { name: 'DeepSeek R1 Distill Qwen 14B', size: '28 GB', hardware: 'GPU Required' }
+        };// Initialize wizard
+        function initWizard() {
+            updateStepIndicator();
+            updateButtons();
+            updateDeploymentSummary();
+        }
+
+        // Step navigation
+        function nextStep() {
+            if (currentStep < 3) {
+                if (currentStep === 1 && !selectedModel) return;
+                if (currentStep === 2 && !selectedCluster) return;
+                
+                currentStep++;
+                showStep(currentStep);
+                updateStepIndicator();
+                updateButtons();
+                
+                if (currentStep === 3) {
+                    updateFinalSummary();
+                }
+            } else {
+                // Deploy
+                deployModel();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                updateStepIndicator();
+                updateButtons();
+            }
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelector(`.step-content[data-step="${step}"]`).classList.add('active');
+        }
+
+        function updateStepIndicator() {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNumber = index + 1;
+                step.classList.remove('active', 'completed', 'inactive');
+                
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.add('inactive');
+                }
+            });
+        }
+
+        function updateButtons() {
+            const backButton = document.getElementById('backButton');
+            const nextButton = document.getElementById('nextButton');
+            
+            backButton.style.display = currentStep > 1 ? 'block' : 'none';
+            
+            if (currentStep === 1) {
+                nextButton.disabled = !selectedModel;
+                nextButton.textContent = 'Next Step';
+            } else if (currentStep === 2) {
+                nextButton.disabled = !selectedCluster;
+                nextButton.textContent = 'Next Step';
+            } else {
+                nextButton.disabled = false;
+                nextButton.textContent = 'Deploy Model';
+            }
+        }        // Model selection
+        function selectModel(card) {
+            document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedModel = card.dataset.model;
+            updateButtons();
+            updateDeploymentSummary();
+        }        function updateDeploymentName(name) {
+            deploymentConfig.name = name;
+            updateDeploymentSummary();
+        }
+
+        function filterModels(query) {
+            const cards = document.querySelectorAll('.model-card');
+            cards.forEach(card => {
+                const name = card.querySelector('.model-name').textContent.toLowerCase();
+                const description = card.querySelector('.model-description').textContent.toLowerCase();
+                const visible = name.includes(query.toLowerCase()) || description.includes(query.toLowerCase());
+                card.style.display = visible ? 'block' : 'none';
+            });
+        }        // Cluster selection
+        function selectCluster(item) {
+            document.querySelectorAll('.cluster-item').forEach(i => i.classList.remove('selected'));
+            item.classList.add('selected');
+            selectedCluster = item.dataset.cluster;
+            
+            // Set default instance type based on cluster capabilities
+            if (clusterInstanceTypes[selectedCluster]) {
+                const availableTypes = clusterInstanceTypes[selectedCluster];
+                deploymentConfig.instanceType = availableTypes[0]; // Set first available as default
+                updateDeploymentSummary();
+            }
+            
+            updateButtons();
+        }function filterClusters() {
+            // Placeholder for cluster filtering logic
+            console.log('Filtering clusters...');
+        }        // Configuration
+        function openConfigModal() {
+            document.getElementById('configModal').classList.add('show');
+            
+            // Populate instance types based on selected cluster
+            const instanceTypeSelect = document.getElementById('instanceType');
+            instanceTypeSelect.innerHTML = '';
+            
+            if (selectedCluster && clusterInstanceTypes[selectedCluster]) {
+                const availableTypes = clusterInstanceTypes[selectedCluster];
+                availableTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    const instanceInfo = instanceTypes[type];
+                    option.textContent = `${instanceInfo.SKU} (${instanceInfo.GPUCount} GPU, ${instanceInfo.GPUMemGB}GB, ${instanceInfo.GPUModel})`;
+                    instanceTypeSelect.appendChild(option);
+                });
+            }
+              // Pre-fill form with current config
+            document.getElementById('instanceType').value = deploymentConfig.instanceType;
+            document.getElementById('replicas').value = deploymentConfig.replicas;
+            document.getElementById('memoryLimit').value = deploymentConfig.memoryLimit;
+            document.getElementById('cpuLimit').value = deploymentConfig.cpuLimit;
+            document.getElementById('gpuMemoryUtilization').value = deploymentConfig.gpuMemoryUtilization;
+            document.getElementById('swapSpace').value = deploymentConfig.swapSpace;
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.remove('show');
+        }
+
+        function updateInstanceTypeFromModal(instanceType) {
+            deploymentConfig.instanceType = instanceType;
+            updateDeploymentSummary();
+        }        function saveConfiguration() {
+            deploymentConfig.instanceType = document.getElementById('instanceType').value;
+            deploymentConfig.replicas = document.getElementById('replicas').value;
+            deploymentConfig.memoryLimit = document.getElementById('memoryLimit').value;
+            deploymentConfig.cpuLimit = document.getElementById('cpuLimit').value;
+            deploymentConfig.gpuMemoryUtilization = document.getElementById('gpuMemoryUtilization').value;
+            deploymentConfig.swapSpace = document.getElementById('swapSpace').value;
+            
+            updateDeploymentSummary();
+            closeConfigModal();
+        }function updateDeploymentSummary() {
+            document.getElementById('selectedDeploymentName').textContent = deploymentConfig.name;
+            
+            if (selectedModel && modelData[selectedModel]) {
+                const model = modelData[selectedModel];
+                document.getElementById('selectedModelName').textContent = model.name;
+                document.getElementById('selectedModelSize').textContent = model.size;
+            }
+            
+            // Update instance type display with GPU info
+            const instanceInfo = instanceTypes[deploymentConfig.instanceType];
+            if (instanceInfo) {
+                document.getElementById('selectedInstanceType').textContent = 
+                    `${instanceInfo.SKU} (${instanceInfo.GPUCount} GPU, ${instanceInfo.GPUMemGB}GB, ${instanceInfo.GPUModel})`;
+            }
+        }        function updateFinalSummary() {
+            document.getElementById('finalDeploymentName').textContent = deploymentConfig.name;
+            
+            if (selectedModel && modelData[selectedModel]) {
+                document.getElementById('finalModelName').textContent = modelData[selectedModel].name;
+            }
+            if (selectedCluster) {
+                document.getElementById('finalClusterName').textContent = selectedCluster;
+            }
+            
+            // Update instance type display with GPU info
+            const instanceInfo = instanceTypes[deploymentConfig.instanceType];
+            if (instanceInfo) {
+                document.getElementById('finalInstanceType').textContent = 
+                    `${instanceInfo.SKU} (${instanceInfo.GPUCount} GPU, ${instanceInfo.GPUMemGB}GB, ${instanceInfo.GPUModel})`;
+            }
+              document.getElementById('finalReplicas').textContent = deploymentConfig.replicas;
+            document.getElementById('finalMemoryLimit').textContent = `${deploymentConfig.memoryLimit} GB`;
+            document.getElementById('finalCpuLimit').textContent = `${deploymentConfig.cpuLimit} cores`;
+            document.getElementById('finalGpuMemoryUtilization').textContent = deploymentConfig.gpuMemoryUtilization;
+            document.getElementById('finalSwapSpace').textContent = `${deploymentConfig.swapSpace} GB`;
+            
+            // Generate YAML
+            generateYAML();
+        }
+
+        // YAML generation
+        function generateYAML() {
+            const modelName = selectedModel ? selectedModel.replace('/', '-').replace('microsoft-', '').replace('meta-', '').replace('mistralai-', '') : 'model';
+            const workspaceName = `workspace-${deploymentConfig.name.toLowerCase().replace(/\s+/g, '-')}`;
+            const configMapName = `${modelName}-inference-params`;
+            
+            const yaml = `apiVersion: kaito.sh/v1beta1
+kind: Workspace
+metadata:
+  name: ${workspaceName}
+spec:
+  resource:
+    instanceType: "${deploymentConfig.instanceType}"
+    labelSelector:
+      matchLabels:
+        app: ${modelName}
+  inference:
+    preset:
+      name: "${selectedModel || 'model-name'}"
+    config: "${configMapName}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${configMapName}
+data:
+  inference_config.yaml: |
+    # Maximum number of steps to find the max available seq len fitting in the GPU memory.
+    max_probe_steps: 6
+
+    vllm:
+      cpu-offload-gb: 0
+      gpu-memory-utilization: ${deploymentConfig.gpuMemoryUtilization}
+      swap-space: ${deploymentConfig.swapSpace}
+      max-model-len: 131072
+      tensor-parallel-size: ${Math.max(1, Math.floor(instanceTypes[deploymentConfig.instanceType]?.GPUCount / 2) || 1)}
+
+      max-seq-len-to-capture: 8192
+      num-scheduler-steps: 1
+      enable-chunked-prefill: true
+      # see https://docs.vllm.ai/en/latest/serving/engine_args.html for more options.`;
+
+            document.getElementById('yamlPreview').textContent = yaml;
+        }function deployModel() {
+            // Store deployment configuration in localStorage for the progress page
+            localStorage.setItem('selectedModel', selectedModel);
+            localStorage.setItem('selectedCluster', selectedCluster);
+            localStorage.setItem('instanceType', deploymentConfig.instanceType);
+            localStorage.setItem('deploymentName', deploymentConfig.name);
+            localStorage.setItem('replicas', deploymentConfig.replicas);
+            localStorage.setItem('memoryLimit', deploymentConfig.memoryLimit);
+            localStorage.setItem('cpuLimit', deploymentConfig.cpuLimit);
+            localStorage.setItem('gpuMemoryUtilization', deploymentConfig.gpuMemoryUtilization);
+            localStorage.setItem('swapSpace', deploymentConfig.swapSpace);
+            
+            // Redirect to deployment progress page
+            window.location.href = 'moc-deployment-progress.html?' + 
+                `model=${encodeURIComponent(selectedModel)}&` +
+                `cluster=${encodeURIComponent(selectedCluster)}&` +
+                `instance=${encodeURIComponent(deploymentConfig.instanceType)}`;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initWizard);
+    </script>
+</body>
+</html>

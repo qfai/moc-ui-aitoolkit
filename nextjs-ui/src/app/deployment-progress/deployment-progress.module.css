@@ -1,0 +1,309 @@
+.deploymentContainer {
+  width: 700px;
+  max-width: 95vw;
+  background: #2d2d2d;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  margin: 20px auto;
+}
+
+.deploymentHeader {
+  background: linear-gradient(135deg, #007acc, #005a9e);
+  padding: 24px;
+  text-align: center;
+  color: white;
+}
+
+.deploymentTitle {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.deploymentSubtitle {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.deploymentContent {
+  padding: 32px;
+}
+
+.deploymentSummary {
+  background: #404040;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 32px;
+}
+
+.summaryTitle {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #e0e0e0;
+  font-size: 16px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.summaryLabel {
+  color: #b0b0b0;
+}
+
+.summaryValue {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.deploymentSteps {
+  margin-top: 24px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #404040;
+  border-radius: 8px;
+  border-left: 4px solid #555;
+  transition: all 0.3s ease;
+}
+
+.stepItem.active {
+  border-left-color: #007acc;
+  background: #454545;
+}
+
+.stepItem.completed {
+  border-left-color: #16a085;
+  background: #3a4a42;
+}
+
+.stepItem.failed {
+  border-left-color: #e74c3c;
+  background: #4a3a3a;
+}
+
+.stepIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  background: #555;
+  color: #b0b0b0;
+}
+
+.stepItem.active .stepIcon {
+  background: #007acc;
+  color: white;
+}
+
+.stepItem.completed .stepIcon {
+  background: #16a085;
+  color: white;
+}
+
+.stepItem.failed .stepIcon {
+  background: #e74c3c;
+  color: white;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #e0e0e0;
+}
+
+.stepDescription {
+  color: #b0b0b0;
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.stepDetails {
+  font-size: 12px;
+  color: #888;
+  font-family: 'Courier New', monospace;
+  background: #333;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #555;
+  border-top: 2px solid #007acc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.checkmark {
+  animation: checkmark 0.5s ease-in-out;
+}
+
+@keyframes checkmark {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.yamlPreview {
+  background: #333;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #e0e0e0;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #555;
+}
+
+.yamlPreview pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.deploymentActions {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px;
+  border-top: 1px solid #555;
+}
+
+.button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 8px;
+}
+
+.button:first-child {
+  margin-left: 0;
+}
+
+.button.primary {
+  background: #007acc;
+  color: white;
+}
+
+.button.primary:hover {
+  background: #005a9e;
+}
+
+.button.primary:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.button.secondary {
+  background: #555;
+  color: #e0e0e0;
+}
+
+.button.secondary:hover {
+  background: #666;
+}
+
+.button.success {
+  background: #16a085;
+  color: white;
+}
+
+.button.success:hover {
+  background: #138d75;
+}
+
+.statusIndicator {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.statusPending {
+  background: #555;
+  color: #b0b0b0;
+}
+
+.statusRunning {
+  background: #007acc;
+  color: white;
+}
+
+.statusCompleted {
+  background: #16a085;
+  color: white;
+}
+
+.statusFailed {
+  background: #e74c3c;
+  color: white;
+}
+
+.logsContainer {
+  background: #333;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #e0e0e0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #555;
+}
+
+.logEntry {
+  margin-bottom: 4px;
+  padding: 2px 0;
+}
+
+.logTimestamp {
+  color: #888;
+  margin-right: 8px;
+}
+
+.logLevel {
+  margin-right: 8px;
+}
+
+.logLevelInfo {
+  color: #16a085;
+}
+
+.logLevelWarn {
+  color: #f39c12;
+}
+
+.logLevelError {
+  color: #e74c3c;
+}

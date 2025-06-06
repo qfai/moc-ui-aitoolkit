@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Kaito Edge Deployment - VS Code AI Toolkit</title>
+    <style>
+        :root {
+            --vscode-background: #1e1e1e;
+            --vscode-foreground: #cccccc;
+            --vscode-editor-background: #252526;
+            --vscode-sidebar-background: #252526;
+            --vscode-panel-background: #1e1e1e;
+            --vscode-button-background: #0e639c;
+            --vscode-button-foreground: #ffffff;
+            --vscode-button-hover-background: #1177bb;
+            --vscode-badge-background: #4d4d4d;
+            --vscode-badge-foreground: #ffffff;
+            --vscode-input-background: #3c3c3c;
+            --vscode-input-foreground: #cccccc;
+            --vscode-input-border: #3c3c3c;
+            --vscode-input-placeholder-foreground: #888888;
+            --vscode-dropdown-background: #3c3c3c;
+            --vscode-dropdown-foreground: #f0f0f0;
+            --vscode-dropdown-border: #3c3c3c;
+            --vscode-tab-active-background: #1e1e1e;
+            --vscode-tab-inactive-background: #2d2d2d;
+            --vscode-panel-border: #80808059;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--vscode-background);
+            color: var(--vscode-foreground);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--vscode-sidebar-background);
+            border-right: 1px solid var(--vscode-panel-border);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-header:hover {
+            background-color: #333333;
+        }
+
+        .section-header-text {
+            margin-left: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .section-content {
+            padding: 0px;
+        }
+
+        .model-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 24px;
+            cursor: pointer;
+        }
+
+        .model-item:hover {
+            background-color: #333333;
+        }
+
+        .model-item-text {
+            margin-left: 5px;
+            font-size: 13px;
+        }
+
+        .main-content {
+            padding: 16px 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+        }
+
+        .tabs {
+            display: flex;
+            background-color: var(--vscode-tab-inactive-background);
+            border-bottom: 1px solid var(--vscode-panel-border);
+        }
+
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-right: 1px solid var(--vscode-panel-border);
+            font-size: 13px;
+        }
+
+        .tab.active {
+            background-color: var(--vscode-tab-active-background);
+            border-bottom: 2px solid #0e639c;
+        }
+
+        .button {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .button:hover {
+            background-color: var(--vscode-button-hover-background);
+        }
+
+        .cluster-card {
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 3px;
+            margin: 8px 0;
+        }
+
+        .cluster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--vscode-panel-border);
+        }
+
+        .cluster-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .cluster-status {
+            font-size: 12px;
+        }
+
+        .cluster-content {
+            padding: 12px;
+        }
+
+        .metric-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .metric-value {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-dot.green {
+            background-color: #4EC9B0;
+        }
+
+        .status-dot.yellow {
+            background-color: #FFCC00;
+        }
+
+        .status-dot.red {
+            background-color: #F48771;
+        }
+
+        .deployed-model-card {
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 3px;
+            margin: 8px 0;
+            padding: 12px;
+        }
+
+        .deployed-model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .deployed-model-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .deployed-model-cluster {
+            font-size: 12px;
+            color: #888888;
+        }
+
+        .deployed-model-metrics {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .auth-container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .auth-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .auth-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .auth-description {
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .toggle-section {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-icon:before {
+            content: '▶';
+            display: inline-block;
+            width: 10px;
+            margin-right: 5px;
+            transform: rotate(0);
+            transition: transform 0.2s;
+        }
+
+        .toggle-section.expanded .toggle-icon:before {
+            transform: rotate(90deg);
+        }        .badge {
+            display: inline-block;
+            background-color: var(--vscode-badge-background);
+            color: var(--vscode-badge-foreground);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 5px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--vscode-editor-background);
+            border-radius: 4px;
+            width: 700px;
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+        }
+        
+        .modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: var(--vscode-foreground);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .steps-indicator {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .step {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #888888;
+        }
+        
+        .step.active {
+            color: var(--vscode-foreground);
+            background-color: var(--vscode-button-background);
+        }
+        
+        .wizard-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .button.primary {
+            background-color: var(--vscode-button-background);
+        }
+        
+        .button.secondary {
+            background-color: #444444;
+        }
+        
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        
+        .model-card.selectable {
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .model-card.selectable:hover, .model-card.selected {
+            border-color: var(--vscode-button-background);
+        }
+        
+        .model-parameters {
+            margin-top: 20px;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 3px;
+            padding: 16px;
+        }
+        
+        .parameter-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .parameter-row label {
+            font-size: 13px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .parameter-row input, .parameter-row select {
+            width: 200px;
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: 1px solid var(--vscode-input-border);
+            padding: 6px;
+            border-radius: 3px;
+        }
+        
+        .cluster-selection {
+            margin-top: 16px;
+        }
+        
+        .cluster-option {
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 3px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .cluster-option.selected {
+            border-color: var(--vscode-button-background);
+        }
+        
+        .cluster-option-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            font-weight: bold;
+        }
+        
+        .cluster-option-details {
+            padding: 0 12px 12px 12px;
+            font-size: 12px;
+            color: #888888;
+        }
+        
+        .progress-container {
+            text-align: center;
+            padding: 32px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--vscode-button-background);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--vscode-button-background);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+          .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .selected-model-container {
+            margin: 16px 0;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 3px;
+        }
+        
+        .selected-model-header {
+            background-color: var(--vscode-background);
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 14px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+        }
+        
+        .selected-model-content {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .selected-model-logo {
+            margin-right: 12px;
+        }
+        
+        .selected-model-info {
+            flex: 1;
+        }
+        
+        .selected-model-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .selected-model-type {
+            color: #888888;
+            font-size: 12px;
+        }
+        
+        .configure-btn {
+            font-size: 12px;
+            padding: 4px 10px;
+        }
+        
+        .selected-model-card {
+            padding: 8px 12px;
+            background-color: var(--vscode-background);
+            border-top: 1px solid var(--vscode-panel-border);
+            color: var(--vscode-button-background);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .model-logo {
+            margin-right: 12px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .model-logo img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .parameter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .model-card {
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 3px;
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .model-card .model-info {
+            flex: 1;
+        }
+        
+        .model-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .model-type {
+            color: #888888;
+            font-size: 12px;
+        }
+
+        .model-size-info {
+            color: #888888;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        
+        .model-hardware-rec {
+            display: inline-block;
+            background-color: rgba(14, 99, 156, 0.2);
+            color: #6cadd8;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+
+        /* New styles for cluster selection step */
+        .step-container {
+            margin-bottom: 16px;
+        }
+        
+        .step-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .step-title {
+            font-size: 14px;
+            color: #dddddd;
+        }
+        
+        .deployment-summary {
+            background-color: #333333;
+            border-radius: 3px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .summary-label {
+            font-size: 13px;
+            color: #bbbbbb;
+        }
+        
+        .summary-value {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .filtering-options {
+            background-color: #333333;
+            border-radius: 3px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .filter-field {
+            flex: 1;
+            margin-right: 8px;
+        }
+        
+        .filter-field:last-child {
+            margin-right: 0;
+        }
+        
+        /* End of new styles */
+        </style>
+</head>
+<body>
+    <div class='sidebar'>
+        <div class='section-header'>
+            <span>🧰 AI TOOLKIT</span>
+        </div>
+        <div class='section-header toggle-section expanded' onclick='toggleSection(this, \"myModels\")'>
+            <span class='toggle-icon'></span>
+            <span class='section-header-text'>MY MODELS</span>
+        </div>
+        <div class='section-content' id='myModels'>
+            <div class='model-item'>
+                <span class='model-item-text'>deepseek-v1-instill-llama-8b</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>gpt-4o</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>mistral/Mistral-7B-Instruct-v0.3</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>phi-3-mini-4k-instruct</span>
+            </div>
+        </div>
+        <div class='section-header toggle-section expanded' onclick='toggleSection(this, \"models\")'>
+            <span class='toggle-icon'></span>
+            <span class='section-header-text'>MODELS</span>
+        </div>
+        <div class='section-content' id='models'>
+            <div class='model-item'>
+                <span class='model-item-text'>Catalog</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>Conversion (Preview)</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>Fine-Tuning</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>Edge</span>
+            </div>
+        </div>
+        <div class='section-header toggle-section expanded' onclick='toggleSection(this, \"tools\")'>
+            <span class='toggle-icon'></span>
+            <span class='section-header-text'>TOOLS</span>
+        </div>
+        <div class='section-content' id='tools'>
+            <div class='model-item'>
+                <span class='model-item-text'>Playground</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>Agent (Prompt) Builder</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>Bulk Run</span>
+            </div>
+            <div class='model-item'>
+                <span class='model-item-text'>Evaluation</span>
+            </div>
+        </div>
+    </div>
+
+    <div class='content-area'>
+        <div class='top-bar'>
+            <div class='tabs'>
+                <div class='tab'>Edge Deployments</div>
+                <div class='tab active'>Clusters</div>
+                <div class='tab'>Deployed Models</div>
+            </div>
+            <button class='button' id='deployToEdgeBtn'>Deploy to Edge</button>
+        </div>
+
+        <div id='authSection' class='main-content'>
+            <div class='auth-container'>
+                <div class='auth-icon'>🔑</div>
+                <div class='auth-title'>Authentication Required</div>
+                <div class='auth-description'>
+                    Please authenticate to access your Arc-enabled Kubernetes clusters.
+                    This will allow you to view and deploy LLM models to your edge clusters.
+                </div>
+                <button class='button' id='authButton' onclick='authenticate()'>Authenticate</button>
+            </div>
+        </div>
+
+        <div id='clustersSection' class='main-content hidden'>
+            <h2>Arc-enabled Kubernetes Clusters</h2>
+            <p>The following clusters are available for edge deployment of your AI models:</p>
+            
+            <div class='cluster-card'>
+                <div class='cluster-header' onclick='toggleClusterDetails(\"cluster1\")'>
+                    <div class='cluster-name'><span class='status-dot green'></span>prod-east-cluster</div>
+                    <div class='cluster-status'>Healthy</div>
+                </div>
+                <div id='cluster1' class='cluster-content'>
+                    <div class='metric-row'>
+                        <div class='metric-label'>CPU Usage:</div>
+                        <div class='metric-value'>45%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Memory Usage:</div>
+                        <div class='metric-value'>62%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>GPU Usage:</div>
+                        <div class='metric-value'>78%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Available GPUs:</div>
+                        <div class='metric-value'>4 x NVIDIA A100</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Kubernetes Version:</div>
+                        <div class='metric-value'>1.28.4</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Kaito Version:</div>
+                        <div class='metric-value'>0.4.3</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='cluster-card'>
+                <div class='cluster-header' onclick='toggleClusterDetails(\"cluster2\")'>
+                    <div class='cluster-name'><span class='status-dot yellow'></span>dev-west-cluster</div>
+                    <div class='cluster-status'>Warning</div>
+                </div>
+                <div id='cluster2' class='cluster-content'>
+                    <div class='metric-row'>
+                        <div class='metric-label'>CPU Usage:</div>
+                        <div class='metric-value'>78%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Memory Usage:</div>
+                        <div class='metric-value'>82%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>GPU Usage:</div>
+                        <div class='metric-value'>25%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Available GPUs:</div>
+                        <div class='metric-value'>2 x NVIDIA T4</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Kubernetes Version:</div>
+                        <div class='metric-value'>1.27.7</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Kaito Version:</div>
+                        <div class='metric-value'>0.4.2</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='cluster-card'>
+                <div class='cluster-header' onclick='toggleClusterDetails(\"cluster3\")'>
+                    <div class='cluster-name'><span class='status-dot red'></span>test-central-cluster</div>
+                    <div class='cluster-status'>Critical</div>
+                </div>
+                <div id='cluster3' class='cluster-content'>
+                    <div class='metric-row'>
+                        <div class='metric-label'>CPU Usage:</div>
+                        <div class='metric-value'>92%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Memory Usage:</div>
+                        <div class='metric-value'>95%</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>GPU Usage:</div>
+                        <div class='metric-value'>Error</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Available GPUs:</div>
+                        <div class='metric-value'>0/2 (Driver Error)</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Kubernetes Version:</div>
+                        <div class='metric-value'>1.26.12</div>
+                    </div>
+                    <div class='metric-row'>
+                        <div class='metric-label'>Kaito Version:</div>
+                        <div class='metric-value'>0.4.0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id='deployedModelsSection' class='main-content hidden'>
+            <h2>Deployed Models</h2>
+            <p>The following models are currently deployed to your edge clusters:</p>
+
+            <div class='deployed-model-card'>
+                <div class='deployed-model-header'>
+                    <div class='deployed-model-name'>phi-3-mini-4k-instruct</div>
+                    <div><span class='badge'>Running</span></div>
+                </div>
+                <div class='deployed-model-cluster'>
+                    Deployed on: prod-east-cluster
+                </div>
+                <div class='deployed-model-metrics'>
+                    <div>Inference time (avg): 42ms</div>
+                    <div>Requests per minute: 127</div>
+                    <div>Memory usage: 4.2 GB</div>
+                    <div>Deployed: 2 days ago</div>
+                </div>
+            </div>
+
+            <div class='deployed-model-card'>
+                <div class='deployed-model-header'>
+                    <div class='deployed-model-name'>mistral/Mistral-7B-Instruct-v0.3</div>
+                    <div><span class='badge'>Running</span></div>
+                </div>
+                <div class='deployed-model-cluster'>
+                    Deployed on: prod-east-cluster
+                </div>
+                <div class='deployed-model-metrics'>
+                    <div>Inference time (avg): 138ms</div>
+                    <div>Requests per minute: 52</div>
+                    <div>Memory usage: 13.8 GB</div>
+                    <div>Deployed: 1 week ago</div>
+                </div>
+            </div>
+
+            <div class='deployed-model-card'>
+                <div class='deployed-model-header'>
+                    <div class='deployed-model-name'>microsoft/phi-2</div>
+                    <div><span class='badge'>Scaling</span></div>
+                </div>
+                <div class='deployed-model-cluster'>
+                    Deployed on: dev-west-cluster
+                </div>
+                <div class='deployed-model-metrics'>
+                    <div>Inference time (avg): 87ms</div>
+                    <div>Requests per minute: 12</div>
+                    <div>Memory usage: 2.7 GB</div>
+                    <div>Deployed: 3 hours ago</div>
+                </div>
+            </div>
+        </div>
+    </div>    <!-- Model Configuration Modal -->
+    <div id="configureModal" class="modal hidden">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <div>Configure Model</div>
+                <button class="close-button" onclick="closeConfigureModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <h4>Model Configuration</h4>
+                <div class="parameter-row">
+                    <label>Max Sequence Length</label>
+                    <input type="number" value="4096" min="1024" max="32000" />
+                </div>
+                <div class="parameter-row">
+                    <label>Replica Count</label>
+                    <input type="number" value="1" min="1" max="10" />
+                </div>
+                <div class="parameter-row">
+                    <label>Resource Requests</label>
+                    <select>
+                        <option>Standard (4 vCPUs, 16GB RAM)</option>
+                        <option>High Performance (8 vCPUs, 32GB RAM)</option>
+                        <option>Custom</option>
+                    </select>
+                </div>
+                <div class="parameter-row">
+                    <label>Model Quantization</label>
+                    <select>
+                        <option>None (FP16)</option>
+                        <option>INT8</option>
+                        <option>INT4</option>
+                    </select>
+                </div>
+                <div class="parameter-actions">
+                    <button class="button secondary" onclick="closeConfigureModal()">Cancel</button>
+                    <button class="button primary" onclick="saveModelConfiguration()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deploy to Edge Modal Wizard -->
+    <div id="deployToEdgeModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="steps-indicator">
+                    <div class="step active" id="step1Indicator">Step 1: Select Model</div>
+                    <div class="step" id="step2Indicator">Step 2: Select Cluster</div>
+                </div>
+                <button class="close-button" onclick="closeDeployModal()">×</button>
+            </div>
+              <!-- Step 1: Model Selection -->
+            <div id="step1Content" class="modal-body">
+                <div class="step-container">
+                    <div class="step-header">STEP 1</div>
+                    <div class="step-title">Select model</div>
+                </div>
+                  <div class="input-field">
+                    <label class="input-label">LLM Name</label>
+                    <input type="text" id="llmNameInput" placeholder="My LLM Deployment" />
+                </div>
+                
+                <div class="selected-model-container">
+                    <div class="selected-model-header">
+                        <span>Selected Model</span>
+                    </div>                    
+                    <div class="selected-model-content">
+                        <div class="selected-model-logo">
+                            <img src="https://via.placeholder.com/40" alt="Microsoft Logo" />
+                        </div>
+                        <div class="selected-model-info">
+                            <div class="selected-model-name">microsoft/phi-silica</div>
+                            <div class="selected-model-type">Text Generation</div>
+                            <div class="selected-model-size">Model Size: <span id="modelSizeValue">1.3 GB</span></div>
+                        </div>
+                        <button class="button configure-btn" onclick="openConfigureModal()">Configure</button>
+                    </div>
+                    <div class="selected-model-card">Model Card</div>
+                </div>
+                
+                <div class="model-selection">
+                    <h4>Model Catalog</h4>
+                    <div class="input-field search-field">
+                        <input type="text" id="modelSearchInput" placeholder="Search models..." oninput="searchModels()" />
+                    </div>
+                    <div class="model-grid">
+                        <div class="model-card selectable selected" onclick="selectModel(this, 'microsoft/phi-silica', 'Text Generation', '1.3 GB', 'CPU or GPU')">
+                            <div class="model-logo">
+                                <img src="https://via.placeholder.com/30" alt="Microsoft Logo" />
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">microsoft/phi-silica</div>
+                                <div class="model-type">Text Generation</div>
+                                <div class="model-size-info">1.3 GB</div>
+                                <div class="model-hardware-rec">CPU or GPU</div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-card selectable" onclick="selectModel(this, 'meta-llama/Llama-v3-8b', 'Text Generation', '4.8 GB', 'GPU Recommended')">
+                            <div class="model-logo">
+                                <img src="https://via.placeholder.com/30" alt="Meta Logo" />
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">meta-llama/Llama-v3-8b</div>
+                                <div class="model-type">Text Generation</div>
+                                <div class="model-size-info">4.8 GB</div>
+                                <div class="model-hardware-rec">GPU Recommended</div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-card selectable" onclick="selectModel(this, 'meta-llama/Llama-2-7b', 'Text Generation', '3.9 GB', 'GPU Recommended')">
+                            <div class="model-logo">
+                                <img src="https://via.placeholder.com/30" alt="Meta Logo" />
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">meta-llama/Llama-2-7b</div>
+                                <div class="model-type">Text Generation</div>
+                                <div class="model-size-info">3.9 GB</div>
+                                <div class="model-hardware-rec">GPU Recommended</div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-card selectable" onclick="selectModel(this, 'microsoft/phi-1.5', 'Text Generation', '1.8 GB', 'CPU or GPU')">
+                            <div class="model-logo">
+                                <img src="https://via.placeholder.com/30" alt="Microsoft Logo" />
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">microsoft/phi-1.5</div>
+                                <div class="model-type">Text Generation</div>
+                                <div class="model-size-info">1.8 GB</div>
+                                <div class="model-hardware-rec">CPU or GPU</div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-card selectable" onclick="selectModel(this, 'microsoft/phi-2', 'Text Generation', '2.7 GB', 'CPU or GPU')">
+                            <div class="model-logo">
+                                <img src="https://via.placeholder.com/30" alt="Microsoft Logo" />
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">microsoft/phi-2</div>
+                                <div class="model-type">Text Generation</div>
+                                <div class="model-size-info">2.7 GB</div>
+                                <div class="model-hardware-rec">CPU or GPU</div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-card selectable" onclick="selectModel(this, 'microsoft/Phi-3-mini-4k-instruct', 'Text Generation', '4.6 GB', 'GPU Recommended')">
+                            <div class="model-logo">
+                                <img src="https://via.placeholder.com/30" alt="Microsoft Logo" />
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">microsoft/Phi-3-mini-4k-instruct</div>
+                                <div class="model-type">Text Generation</div>
+                                <div class="model-size-info">4.6 GB</div>
+                                <div class="model-hardware-rec">GPU Recommended</div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-card selectable" onclick="selectModel(this, 'mistral/Mistral-7B', 'Text Generation', '4.1 GB', 'GPU Recommended')">
+                            <div class="model-logo">
+                                <img src="https://via.placeholder.com/30" alt="Mistral Logo" />
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">mistral/Mistral-7B</div>
+                                <div class="model-type">Text Generation</div>
+                                <div class="model-size-info">4.1 GB</div>
+                                <div class="model-hardware-rec">GPU Recommended</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wizard-buttons">
+                    <button class="button secondary" onclick="closeDeployModal()">Cancel</button>
+                    <button class="button primary" onclick="goToStep2()">Next Step →</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Cluster Selection -->
+            <div id="step2Content" class="modal-body hidden">
+                <div class="step-container">
+                    <div class="step-header">STEP 2</div>
+                    <div class="step-title">Select deployment target</div>
+                </div>
+                
+                <div class="deployment-summary">
+                    <h4>Deployment Summary</h4>
+                    <div class="summary-item">
+                        <div class="summary-label">Model Name:</div>
+                        <div class="summary-value" id="summaryModelName">microsoft/phi-silica</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Deployment Name:</div>
+                        <div class="summary-value" id="summaryDeploymentName">My LLM Deployment</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Model Size:</div>
+                        <div class="summary-value" id="summaryModelSize">1.3 GB</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Configuration:</div>
+                        <div class="summary-value" id="summaryConfiguration">Standard (1 replica)</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Hardware Recommendation:</div>
+                        <div class="summary-value" id="summaryHardware">CPU or GPU</div>
+                    </div>
+                </div>
+                
+                <div class="filtering-options">
+                    <div class="filter-row">
+                        <div class="filter-field">
+                            <label class="input-label">Resource Group</label>
+                            <select id="resourceGroupSelect" onchange="filterClusters()">
+                                <option value="all">All Resource Groups</option>
+                                <option value="Production">Production</option>
+                                <option value="Development">Development</option>
+                                <option value="Testing">Testing</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label class="input-label">Region</label>
+                            <select id="regionSelect" onchange="filterClusters()">
+                                <option value="all">All Regions</option>
+                                <option value="East US">East US</option>
+                                <option value="West US">West US</option>
+                                <option value="Central US">Central US</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label class="input-label">Hardware</label>
+                            <select id="hardwareSelect" onchange="filterClusters()">
+                                <option value="all">All Hardware</option>
+                                <option value="GPU">GPU Available</option>
+                                <option value="CPU">CPU Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4>Available Arc-enabled Kubernetes Clusters</h4>
+                
+                <div class="cluster-selection">
+                    <div class="cluster-option selected" onclick="selectCluster(this, 'prod-east-cluster', 'Production', 'East US', '4 x NVIDIA A100')">
+                        <div class="cluster-option-header">
+                            <div><span class="status-dot green"></span> prod-east-cluster</div>
+                            <div><input type="radio" name="cluster" checked /></div>
+                        </div>
+                        <div class="cluster-option-details">
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Resource Group:</div>
+                                <div class="cluster-detail-value">Production</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Region:</div>
+                                <div class="cluster-detail-value">East US</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">GPU:</div>
+                                <div class="cluster-detail-value">4 x NVIDIA A100</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">CPU:</div>
+                                <div class="cluster-detail-value">32 vCPUs</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Memory:</div>
+                                <div class="cluster-detail-value">128 GB</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Kaito Version:</div>
+                                <div class="cluster-detail-value">0.4.3</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cluster-option" onclick="selectCluster(this, 'dev-west-cluster', 'Development', 'West US', '2 x NVIDIA T4')">
+                        <div class="cluster-option-header">
+                            <div><span class="status-dot yellow"></span> dev-west-cluster</div>
+                            <div><input type="radio" name="cluster" /></div>
+                        </div>
+                        <div class="cluster-option-details">
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Resource Group:</div>
+                                <div class="cluster-detail-value">Development</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Region:</div>
+                                <div class="cluster-detail-value">West US</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">GPU:</div>
+                                <div class="cluster-detail-value">2 x NVIDIA T4</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">CPU:</div>
+                                <div class="cluster-detail-value">16 vCPUs</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Memory:</div>
+                                <div class="cluster-detail-value">64 GB</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Kaito Version:</div>
+                                <div class="cluster-detail-value">0.4.2</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cluster-option" onclick="selectCluster(this, 'test-central-cluster', 'Testing', 'Central US', '2 x NVIDIA T4 (Driver Error)')">
+                        <div class="cluster-option-header">
+                            <div><span class="status-dot red"></span> test-central-cluster</div>
+                            <div><input type="radio" name="cluster" /></div>
+                        </div>
+                        <div class="cluster-option-details">
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Resource Group:</div>
+                                <div class="cluster-detail-value">Testing</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Region:</div>
+                                <div class="cluster-detail-value">Central US</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">GPU:</div>
+                                <div class="cluster-detail-value">2 x NVIDIA T4 (Driver Error)</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">CPU:</div>
+                                <div class="cluster-detail-value">8 vCPUs</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Memory:</div>
+                                <div class="cluster-detail-value">32 GB</div>
+                            </div>
+                            <div class="cluster-detail-row">
+                                <div class="cluster-detail-label">Kaito Version:</div>
+                                <div class="cluster-detail-value">0.4.0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wizard-buttons">
+                    <button class="button secondary" onclick="goToStep1()">← Back</button>
+                    <button class="button primary" id="deployButton" onclick="deployModel()">Deploy</button>
+                </div>
+            </div>
+            
+            <!-- Deployment in Progress -->
+            <div id="deploymentProgress" class="modal-body hidden">
+                <div class="progress-container">
+                    <div class="spinner"></div>
+                    <h3>Deploying microsoft/phi-silica to prod-east-cluster</h3>
+                    <p>This may take a few minutes. Please do not close this window.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle section expansion        function toggleSection(element, id) {
+            element.classList.toggle('expanded');
+            const content = document.getElementById(id);
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
+            }
+        }
+
+        // Toggle cluster details
+        function toggleClusterDetails(id) {
+            const content = document.getElementById(id);
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
+            }
+        }
+
+        // Simulate authentication
+        function authenticate() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('clustersSection').classList.remove('hidden');
+        }
+        
+        // Deploy to Edge wizard functions
+        function openDeployModal() {
+            document.getElementById('deployToEdgeModal').classList.remove('hidden');
+        }
+        
+        function closeDeployModal() {
+            document.getElementById('deployToEdgeModal').classList.add('hidden');
+            // Reset to step 1
+            goToStep1();
+        }
+        
+        function goToStep1() {
+            document.getElementById('step1Content').classList.remove('hidden');
+            document.getElementById('step2Content').classList.add('hidden');
+            document.getElementById('deploymentProgress').classList.add('hidden');
+            document.getElementById('step1Indicator').classList.add('active');
+            document.getElementById('step2Indicator').classList.remove('active');
+        }
+        
+        function goToStep2() {
+            document.getElementById('step1Content').classList.add('hidden');
+            document.getElementById('step2Content').classList.remove('hidden');
+            document.getElementById('step1Indicator').classList.remove('active');
+            document.getElementById('step2Indicator').classList.add('active');
+        }
+          function selectModel(element, modelName, modelType, modelSize, hardwareRec) {
+            // Remove selected class from all models
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked model
+            element.classList.add('selected');
+            
+            // Update the selected model section
+            document.querySelector('.selected-model-name').textContent = modelName || element.querySelector('.model-name').textContent;
+            document.querySelector('.selected-model-type').textContent = modelType || element.querySelector('.model-type').textContent;
+            document.getElementById('modelSizeValue').textContent = modelSize || 'N/A';
+            // Update hardware recommendation display
+            const hardwareRecElement = document.querySelector('.selected-model-info .selected-model-hardware-rec');
+            if (hardwareRec) {
+                hardwareRecElement.style.display = 'block';
+                hardwareRecElement.textContent = 'Hardware Recommendation: ' + hardwareRec;
+            } else {
+                hardwareRecElement.style.display = 'none';
+            }
+        }
+          function openConfigureModal() {
+            document.getElementById('configureModal').classList.remove('hidden');
+        }
+        
+        function closeConfigureModal() {
+            document.getElementById('configureModal').classList.add('hidden');
+        }
+        
+        function saveModelConfiguration() {
+            // Here you would save the configuration
+            closeConfigureModal();
+            // Show a notification that configuration was saved
+            showNotification('Model configuration updated');
+        }
+        
+        function selectCluster(element, clusterName, resourceGroup, region, gpu) {
+            // Remove selected class from all clusters
+            document.querySelectorAll('.cluster-option').forEach(option => {
+                option.classList.remove('selected');
+                option.querySelector('input[type="radio"]').checked = false;
+            });
+            
+            // Add selected class to clicked cluster
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+            
+            // Update deployment summary
+            document.getElementById('summaryModelName').textContent = document.querySelector('.selected-model-name').textContent;
+            document.getElementById('summaryDeploymentName').textContent = document.getElementById('llmNameInput').value || 'My LLM Deployment';
+            document.getElementById('summaryModelSize').textContent = document.getElementById('modelSizeValue').textContent;
+            document.getElementById('summaryConfiguration').textContent = 'Standard (1 replica)'; // Update this line if configuration options are added
+            document.getElementById('summaryHardware').textContent = gpu;
+        }
+        
+        function filterClusters() {
+            const resourceGroup = document.getElementById('resourceGroupSelect').value;
+            const region = document.getElementById('regionSelect').value;
+            const hardware = document.getElementById('hardwareSelect').value;
+            
+            document.querySelectorAll('.cluster-option').forEach(option => {
+                const clusterResourceGroup = option.querySelector('.cluster-option-details div').textContent.split(': ')[1];
+                const clusterRegion = option.querySelector('.cluster-option-details div:nth-child(2)').textContent.split(': ')[1];
+                const clusterGpu = option.querySelector('.cluster-option-details div:nth-child(3)').textContent.split(': ')[1];
+                
+                let show = true;
+                
+                if (resourceGroup !== 'all' && clusterResourceGroup !== resourceGroup) {
+                    show = false;
+                }
+                
+                if (region !== 'all' && clusterRegion !== region) {
+                    show = false;
+                }
+                
+                if (hardware === 'GPU' && !clusterGpu.includes('NVIDIA')) {
+                    show = false;
+                } else if (hardware === 'CPU' && clusterGpu.includes('NVIDIA')) {
+                    show = false;
+                }
+                
+                option.style.display = show ? 'block' : 'none';
+            });
+        }
+        
+        function deployModel() {
+            // Show deployment in progress
+            document.getElementById('step2Content').classList.add('hidden');
+            document.getElementById('deploymentProgress').classList.remove('hidden');
+            
+            // Simulate deployment process
+            setTimeout(() => {
+                // Close modal
+                closeDeployModal();
+                
+                // Add model to Edge tab in My Models section
+                addModelToEdgeTab();
+                
+                // Show deployed models tab
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab')[2].classList.add('active');
+                document.getElementById('clustersSection').classList.add('hidden');
+                document.getElementById('deployedModelsSection').classList.remove('hidden');
+                
+                // Show success notification
+                showNotification('Model deployed successfully');
+            }, 3000);
+        }
+        
+        function addModelToEdgeTab() {
+            // Check if Edge tab exists in My Models
+            const myModelsSection = document.getElementById('myModels');
+            let edgeTab = myModelsSection.querySelector('.model-item:last-child');
+            
+            if (!edgeTab || edgeTab.textContent.trim() !== 'Edge') {
+                // Create Edge tab
+                const edgeTabItem = document.createElement('div');
+                edgeTabItem.className = 'model-item';
+                edgeTabItem.innerHTML = '<span class="model-item-text">Edge</span>';
+                myModelsSection.appendChild(edgeTabItem);
+                
+                // Create Edge section
+                const edgeSection = document.createElement('div');
+                edgeSection.className = 'model-item';
+                edgeSection.style.paddingLeft = '40px';
+                edgeSection.innerHTML = '<span class="model-item-text">microsoft/phi-silica (prod-east-cluster)</span>';
+                myModelsSection.appendChild(edgeSection);
+            } else {
+                // Add model to existing Edge tab
+                const edgeSection = document.createElement('div');
+                edgeSection.className = 'model-item';
+                edgeSection.style.paddingLeft = '40px';
+                edgeSection.innerHTML = '<span class="model-item-text">microsoft/phi-silica (prod-east-cluster)</span>';
+                myModelsSection.appendChild(edgeSection);
+            }
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Initialize the tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show appropriate section based on tab
+                const tabText = this.textContent.trim();
+                if (tabText === 'Edge Deployments') {
+                    // Custom logic for Edge Deployments tab
+                } else if (tabText === 'Clusters') {
+                    document.getElementById('clustersSection').classList.remove('hidden');
+                    document.getElementById('deployedModelsSection').classList.add('hidden');
+                } else if (tabText === 'Deployed Models') {
+                    document.getElementById('clustersSection').classList.add('hidden');
+                    document.getElementById('deployedModelsSection').classList.remove('hidden');
+                }
+            });
+        });
+
+        // Deploy to Edge button handler
+        document.getElementById('deployToEdgeBtn').addEventListener('click', function() {
+            openDeployModal();
+        });
+
+        // By default, show auth section
+        document.getElementById('authSection').classList.remove('hidden');
+    </script>
+</body>
+</html>
