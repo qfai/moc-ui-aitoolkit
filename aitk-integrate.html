@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy model to Azure AI Foundry</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }        .wizard-container {
+            width: 900px;
+            max-width: 95vw;
+            background: #2d2d2d;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .wizard-header {
+            background: linear-gradient(135deg, #007acc, #005a9e);
+            padding: 24px;
+            text-align: center;
+            color: white;
+        }
+
+        .wizard-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .wizard-subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }        .wizard-content {
+            padding: 24px;
+        }
+
+        .deploy-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #e0e0e0;
+        }
+
+        .section-description {
+            color: #b0b0b0;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* Deploy Model Section */
+        .deploy-model-section {
+            background: #404040;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .deploy-model-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .deploy-model-title {
+            font-weight: 600;
+            color: #e0e0e0;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px;
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        .required-asterisk {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+
+        .dropdown-container {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .dropdown-selected {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            background: #2d2d2d;
+            border-radius: 6px;
+        }
+
+        .dropdown-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dropdown-title {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .dropdown-subtitle {
+            color: #b0b0b0;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .dropdown-arrow {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #b0b0b0;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            z-index: 1000;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-option {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #555;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-option:hover {
+            background: #404040;
+        }
+
+        .dropdown-option.selected {
+            background: #2d3748;
+            border-left: 4px solid #007acc;
+        }
+
+        .option-name {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .option-details {
+            color: #b0b0b0;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        /* Deployment Details */
+        .deployment-details {
+            background: #353535;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .detail-label {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: #e0e0e0;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .detail-note {
+            color: #f39c12;
+            font-size: 12px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        /* Model Selection */
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .model-card {
+            background: #353535;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .model-card:hover {
+            border-color: #007acc;
+            background: #404040;
+        }
+
+        .model-card.selected {
+            border-color: #007acc;
+            background: #2d3748;
+            box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.3);
+        }
+
+        .model-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+
+        .model-description {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .model-metadata {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .model-size {
+            font-size: 12px;
+            color: #16a085;
+            font-weight: 500;
+        }
+
+        .model-hardware {
+            font-size: 12px;
+            color: #f39c12;
+        }
+
+        /* Buttons */
+        .wizard-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px;
+            border-top: 1px solid #555;
+        }
+
+        .button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button.primary {
+            background: #007acc;
+            color: white;
+        }
+
+        .button.primary:hover {
+            background: #005a9e;
+        }
+
+        .button.primary:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .button.secondary {
+            background: #555;
+            color: #e0e0e0;
+        }
+
+        .button.secondary:hover {
+            background: #666;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">        <div class="wizard-header">
+            <div class="wizard-title">Deploy model to Edge</div>
+            <div class="wizard-subtitle">Deploy and manage AI models on Edge Kubernetes clusters with advanced configuration</div>
+        </div>        <div class="wizard-content">
+            <!-- Deploy Model Section -->
+            <div class="deploy-section">
+                <h2 class="section-title">Deploy a model</h2>
+                <p class="section-description">Configure and deploy AI models to your Edge Kubernetes clusters with custom settings and YAML configuration.</p>
+            
+            <div class="deploy-model-section">
+                <div class="deploy-model-header">
+                    <span class="deploy-model-title">Deploy model</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Deployment name <span class="required-asterisk">*</span></label>
+                    <input type="text" class="form-input" id="deploymentName" value="my-llm-deployment" placeholder="Enter deployment name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Subscription <span class="required-asterisk">*</span></label>
+                    <div class="dropdown-container" id="subscriptionDropdown">
+                        <div class="dropdown-selected" onclick="toggleDropdown('subscription')">
+                            <div class="dropdown-text">
+                                <div class="dropdown-title">Azure Subscription 1</div>
+                                <div class="dropdown-subtitle">subscription-id-12345</div>
+                            </div>
+                            <div class="dropdown-arrow"></div>
+                        </div>
+                        <div class="dropdown-content" id="subscriptionContent">
+                            <div class="dropdown-option selected" onclick="selectSubscription('Azure Subscription 1', 'subscription-id-12345')">
+                                <div class="option-name">Azure Subscription 1</div>
+                                <div class="option-details">subscription-id-12345</div>
+                            </div>
+                            <div class="dropdown-option" onclick="selectSubscription('Azure Subscription 2', 'subscription-id-67890')">
+                                <div class="option-name">Azure Subscription 2</div>
+                                <div class="option-details">subscription-id-67890</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Resource Group <span class="required-asterisk">*</span></label>
+                    <div class="dropdown-container" id="resourceGroupDropdown">
+                        <div class="dropdown-selected" onclick="toggleDropdown('resourceGroup')">
+                            <div class="dropdown-text">
+                                <div class="dropdown-title">rg-prod-east</div>
+                                <div class="dropdown-subtitle">East US • Production Resource Group</div>
+                            </div>
+                            <div class="dropdown-arrow"></div>
+                        </div>
+                        <div class="dropdown-content" id="resourceGroupContent">
+                            <div class="dropdown-option selected" onclick="selectResourceGroup('rg-prod-east', 'East US • Production Resource Group')">
+                                <div class="option-name">rg-prod-east</div>
+                                <div class="option-details">East US • Production Resource Group</div>
+                            </div>
+                            <div class="dropdown-option" onclick="selectResourceGroup('rg-dev-west', 'West US 2 • Development Resource Group')">
+                                <div class="option-name">rg-dev-west</div>
+                                <div class="option-details">West US 2 • Development Resource Group</div>
+                            </div>
+                            <div class="dropdown-option" onclick="selectResourceGroup('rg-staging', 'West Europe • Staging Resource Group')">
+                                <div class="option-name">rg-staging</div>
+                                <div class="option-details">West Europe • Staging Resource Group</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Arc Kubernetes Cluster <span class="required-asterisk">*</span></label>
+                    <div class="dropdown-container" id="clusterDropdown">
+                        <div class="dropdown-selected" onclick="toggleDropdown('cluster')">
+                            <div class="dropdown-text">
+                                <div class="dropdown-title">prod-east-cluster</div>
+                                <div class="dropdown-subtitle">16 vCPUs • 64 GB RAM • 4x NVIDIA V100</div>
+                            </div>
+                            <div class="dropdown-arrow"></div>
+                        </div>
+                        <div class="dropdown-content" id="clusterContent">
+                            <div class="dropdown-option selected" onclick="selectCluster('prod-east-cluster', '16 vCPUs • 64 GB RAM • 4x NVIDIA V100')">
+                                <div class="option-name">prod-east-cluster</div>
+                                <div class="option-details">16 vCPUs • 64 GB RAM • 4x NVIDIA V100</div>
+                            </div>
+                            <div class="dropdown-option" onclick="selectCluster('dev-west-cluster', '8 vCPUs • 32 GB RAM • 2x NVIDIA T4')">
+                                <div class="option-name">dev-west-cluster</div>
+                                <div class="option-details">8 vCPUs • 32 GB RAM • 2x NVIDIA T4</div>
+                            </div>
+                            <div class="dropdown-option" onclick="selectCluster('staging-cluster', '12 vCPUs • 48 GB RAM • 2x NVIDIA A2')">
+                                <div class="option-name">staging-cluster</div>
+                                <div class="option-details">12 vCPUs • 48 GB RAM • 2x NVIDIA A2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LLM Model Selection -->
+                <div class="form-group">
+                    <label class="form-label">LLM Model <span class="required-asterisk">*</span></label>
+                    <select class="form-select" id="llmModel" onchange="updateModelSelection()">
+                        <option value="microsoft/phi-3-mini">Microsoft Phi-3 Mini (2.4 GB)</option>
+                        <option value="microsoft/phi-3-medium">Microsoft Phi-3 Medium (8.4 GB)</option>
+                        <option value="meta-llama/llama-2-7b">Llama 2 7B (13.5 GB)</option>
+                        <option value="mistralai/mistral-7b">Mistral 7B (14.2 GB)</option>
+                        <option value="deepseek-r1-distill-qwen-14b">DeepSeek R1 Distill Qwen 14B (28 GB)</option>
+                        <option value="microsoft/dialoGPT-medium">DialoGPT Medium (1.7 GB)</option>
+                    </select>
+                </div>
+
+                <!-- LLM Configuration -->
+                <div class="form-group">
+                    <label class="form-label">LLM Configuration</label>
+                    <div class="form-group">
+                        <label class="form-label">Replicas</label>
+                        <select class="form-select" id="replicas">
+                            <option value="1">1 Replica</option>
+                            <option value="2">2 Replicas</option>
+                            <option value="3">3 Replicas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Memory Limit (GB)</label>
+                        <input type="number" class="form-input" id="memoryLimit" value="8" min="1" max="64">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">CPU Limit (cores)</label>
+                        <input type="number" class="form-input" id="cpuLimit" value="4" min="1" max="16" step="0.5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">GPU Memory Utilization</label>
+                        <input type="number" class="form-input" id="gpuMemoryUtilization" value="0.95" min="0.1" max="1.0" step="0.05">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Swap Space (GB)</label>
+                        <input type="number" class="form-input" id="swapSpace" value="4" min="0" max="64" step="0.5">                    </div>
+                </div>
+
+                <!-- Edit in YAML Configuration Checkbox -->
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="editYamlCheckbox" onchange="toggleYamlConfiguration()" style="width: 16px; height: 16px; accent-color: #007acc;">
+                        <span class="form-label" style="margin: 0;">Edit in YAML Configuration</span>
+                    </label>
+                </div>
+
+                <!-- YAML Configuration (Hidden by default) -->
+                <div class="form-group" id="yamlConfigSection" style="display: none;">
+                    <label class="form-label">YAML Configuration</label>
+                    <textarea class="form-textarea" id="yamlConfig" placeholder="YAML configuration will be generated here..."># Configuration will be generated here...</textarea>
+                    <div style="margin-top: 8px; display: flex; gap: 12px;">
+                        <button class="button secondary" onclick="generateYAML()">Generate YAML</button>
+                        <button class="button secondary" onclick="downloadYAML()">Download YAML</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-actions">
+            <button class="button secondary" onclick="window.close()">Cancel</button>            <div>
+                <button class="button primary" id="deployButton" onclick="deployToEdge()">Deploy to Edge</button>
+            </div>
+        </div>
+    </div>
+
+    <script>        // Global state
+        let deploymentConfig = {
+            name: 'my-llm-deployment',
+            subscription: 'Azure Subscription 1',
+            resourceGroup: 'rg-prod-east',
+            cluster: 'prod-east-cluster',
+            model: 'microsoft/phi-3-mini',
+            replicas: 1,
+            memoryLimit: 8,
+            cpuLimit: 4,
+            gpuMemoryUtilization: 0.95,
+            swapSpace: 4,
+            modelVersion: '2024-11-20',
+            authType: 'Key',
+            contentFilter: 'Default',
+            contentSafety: 'DefaultV2',
+            upgradePolicy: 'Manual'
+        };
+
+        const modelData = {
+            'microsoft/phi-3-mini': { name: 'Microsoft Phi-3 Mini', size: '2.4 GB', hardware: 'GPU Required' },
+            'microsoft/phi-3-medium': { name: 'Microsoft Phi-3 Medium', size: '8.4 GB', hardware: 'GPU Required' },
+            'meta-llama/llama-2-7b': { name: 'Llama 2 7B', size: '13.5 GB', hardware: 'GPU Required' },
+            'mistralai/mistral-7b': { name: 'Mistral 7B', size: '14.2 GB', hardware: 'GPU Required' },
+            'deepseek-r1-distill-qwen-14b': { name: 'DeepSeek R1 Distill Qwen 14B', size: '28 GB', hardware: 'GPU Required' },
+            'microsoft/dialoGPT-medium': { name: 'DialoGPT Medium', size: '1.7 GB', hardware: 'GPU Required' }
+        };
+
+        const clusterCapacity = {
+            'prod-east-cluster': '4 GPU, 32GB VRAM',
+            'dev-west-cluster': '2 GPU, 16GB VRAM',
+            'staging-cluster': '2 GPU, 16GB VRAM'
+        };
+
+        // Dropdown functionality
+        function toggleDropdown(type) {
+            const dropdown = document.getElementById(type + 'Content');
+            const arrow = document.querySelector(`#${type}Dropdown .dropdown-arrow`);
+            
+            // Close other dropdowns
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('show');
+                }
+            });
+            document.querySelectorAll('.dropdown-arrow').forEach(a => {
+                if (a !== arrow) {
+                    a.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            dropdown.classList.toggle('show');
+            arrow.style.transform = dropdown.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        function selectSubscription(name, id) {
+            deploymentConfig.subscription = name;
+            updateDropdownSelection('subscription', name, id);
+            closeDropdowns();
+        }
+
+        function selectResourceGroup(name, details) {
+            deploymentConfig.resourceGroup = name;
+            updateDropdownSelection('resourceGroup', name, details);
+            closeDropdowns();
+        }
+
+        function selectCluster(name, details) {
+            deploymentConfig.cluster = name;
+            updateDropdownSelection('cluster', name, details);
+            updateDeploymentDetails();
+            closeDropdowns();
+        }
+
+        function updateDropdownSelection(type, title, subtitle) {
+            const selectedDiv = document.querySelector(`#${type}Dropdown .dropdown-selected .dropdown-text`);
+            selectedDiv.innerHTML = `
+                <div class="dropdown-title">${title}</div>
+                <div class="dropdown-subtitle">${subtitle}</div>
+            `;
+            
+            // Update selected option styling
+            const content = document.getElementById(type + 'Content');
+            content.querySelectorAll('.dropdown-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.closest('.dropdown-option').classList.add('selected');
+        }        function selectModel(card) {
+            document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            deploymentConfig.model = card.dataset.model;
+            updateDeploymentDetails();
+        }
+
+        function updateModelSelection() {
+            deploymentConfig.model = document.getElementById('llmModel').value;
+            updateDeploymentDetails();
+        }        function updateDeploymentDetails() {
+            // Update config from form inputs
+            deploymentConfig.replicas = document.getElementById('replicas').value;
+            deploymentConfig.memoryLimit = document.getElementById('memoryLimit').value;
+            deploymentConfig.cpuLimit = document.getElementById('cpuLimit').value;
+            deploymentConfig.gpuMemoryUtilization = document.getElementById('gpuMemoryUtilization').value;
+            deploymentConfig.swapSpace = document.getElementById('swapSpace').value;
+        }
+
+        function toggleYamlConfiguration() {
+            const checkbox = document.getElementById('editYamlCheckbox');
+            const yamlSection = document.getElementById('yamlConfigSection');
+            
+            if (checkbox.checked) {
+                yamlSection.style.display = 'block';
+                // Generate YAML when showing for the first time
+                if (!document.getElementById('yamlConfig').value.trim() || 
+                    document.getElementById('yamlConfig').value === '# Configuration will be generated here...') {
+                    generateYAML();
+                }
+            } else {
+                yamlSection.style.display = 'none';
+            }
+        }
+
+        function generateYAML() {
+            const modelName = deploymentConfig.model ? deploymentConfig.model.replace('/', '-').replace('microsoft-', '').replace('meta-', '').replace('mistralai-', '') : 'model';
+            const workspaceName = `workspace-${deploymentConfig.name.toLowerCase().replace(/\s+/g, '-')}`;
+            const configMapName = `${modelName}-inference-params`;
+            
+            // Update config from current form values
+            updateDeploymentDetails();
+            
+            const yaml = `apiVersion: kaito.sh/v1beta1
+kind: Workspace
+metadata:
+  name: ${workspaceName}
+  namespace: default
+spec:
+  resource:
+    instanceType: "Standard_NK6"
+    labelSelector:
+      matchLabels:
+        app: ${modelName}
+  inference:
+    preset:
+      name: "${deploymentConfig.model || 'model-name'}"
+    config: "${configMapName}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${configMapName}
+  namespace: default
+data:
+  inference_config.yaml: |
+    # Maximum number of steps to find the max available seq len fitting in the GPU memory.
+    max_probe_steps: 6
+    replicas: ${deploymentConfig.replicas}
+    resources:
+      limits:
+        memory: "${deploymentConfig.memoryLimit}Gi"
+        cpu: "${deploymentConfig.cpuLimit}"
+        nvidia.com/gpu: "1"
+      requests:
+        memory: "${Math.floor(deploymentConfig.memoryLimit * 0.8)}Gi"
+        cpu: "${deploymentConfig.cpuLimit * 0.5}"
+        nvidia.com/gpu: "1"
+
+    vllm:
+      cpu-offload-gb: 0
+      gpu-memory-utilization: ${deploymentConfig.gpuMemoryUtilization}
+      swap-space: ${deploymentConfig.swapSpace}
+      max-model-len: 131072
+      tensor-parallel-size: 1
+      max-seq-len-to-capture: 8192
+      num-scheduler-steps: 1
+      enable-chunked-prefill: true
+      # see https://docs.vllm.ai/en/latest/serving/engine_args.html for more options.`;
+
+            document.getElementById('yamlConfig').value = yaml;
+        }
+
+        function downloadYAML() {
+            const yamlContent = document.getElementById('yamlConfig').value;
+            if (!yamlContent || yamlContent === '# Configuration will be generated here...') {
+                generateYAML();
+            }
+            
+            const blob = new Blob([document.getElementById('yamlConfig').value], { type: 'text/yaml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${deploymentConfig.name.toLowerCase().replace(/\s+/g, '-')}-deployment.yaml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function closeDropdowns() {
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                d.classList.remove('show');
+            });
+            document.querySelectorAll('.dropdown-arrow').forEach(a => {
+                a.style.transform = 'rotate(0deg)';
+            });
+        }        function createNewProject() {
+            alert('Create new project functionality would be implemented here');
+        }
+
+        function deployToEdge() {
+            // Update deployment name from input
+            deploymentConfig.name = document.getElementById('deploymentName').value;
+            
+            // Update all config from form
+            updateDeploymentDetails();
+            
+            // Store deployment configuration
+            localStorage.setItem('edgeDeployment', JSON.stringify(deploymentConfig));
+            localStorage.setItem('deploymentType', 'edge');
+            localStorage.setItem('deploymentName', deploymentConfig.name);
+            localStorage.setItem('selectedModel', deploymentConfig.model);
+            localStorage.setItem('selectedCluster', deploymentConfig.cluster);
+            localStorage.setItem('deploymentTarget', 'Edge');
+            
+            // Store YAML configuration
+            const yamlContent = document.getElementById('yamlConfig').value;
+            if (yamlContent && yamlContent !== '# Configuration will be generated here...') {
+                localStorage.setItem('deploymentYAML', yamlContent);
+            }
+            
+            // Redirect to deployment progress page
+            window.location.href = 'moc-deployment-progress.html?' + 
+                `type=edge&` +
+                `name=${encodeURIComponent(deploymentConfig.name)}&` +
+                `model=${encodeURIComponent(deploymentConfig.model)}&` +
+                `cluster=${encodeURIComponent(deploymentConfig.cluster)}`;
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown-container')) {
+                closeDropdowns();
+            }
+        });        // Update deployment name in config when input changes
+        document.getElementById('deploymentName').addEventListener('input', function(e) {
+            deploymentConfig.name = e.target.value;
+        });
+
+        // Add event listeners for LLM configuration changes
+        document.getElementById('replicas').addEventListener('change', updateDeploymentDetails);
+        document.getElementById('memoryLimit').addEventListener('input', updateDeploymentDetails);
+        document.getElementById('cpuLimit').addEventListener('input', updateDeploymentDetails);
+        document.getElementById('gpuMemoryUtilization').addEventListener('input', updateDeploymentDetails);
+        document.getElementById('swapSpace').addEventListener('input', updateDeploymentDetails);        // Initialize
+        updateDeploymentDetails();
+    </script>
+</body>
+</html>
